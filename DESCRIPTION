@@ -4,7 +4,7 @@ Title: MANTICORE: The SCORPION/LIONESS hybrid method
 Version: 0.1.0
 Authors@R: c(
   person("Ladislav", "Hovan", email = "ladislav.hovan@ncmbm.uio.no", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8847-9295")),
-  person("Daniel", "Osorio", email = "daniecos@uio.no", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4424-8422")),
+  person("Daniel", "Osorio", email = "daniecos@uio.no", role = c("aut"), comment = c(ORCID = "0000-0003-4424-8422")),
   person("Mariike L.", "Kuijjer", email = "mariike.kuijjer@helsinki.fi", role = c("aut"), comment = c(ORCID = "0000-0001-6280-3130")))
 Description: Constructs gene regulatory networks from single-cell RNA-sequencing data. The method is based on the SCORPION algorithm, but networks are reconstructed for every supercell using the LIONESS approach.
 License: GPL-3
