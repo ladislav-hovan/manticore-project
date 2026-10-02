@@ -15,4 +15,4 @@ Imports: cli, dplyr, furrr, future, igraph, irlba, Matrix, methods, pbapply, RAN
 Suggests: biomaRt, circlize, fgsea, mori, RhpcBLASctl, testthat
 URL: https://github.com/ladislav-hovan/manticore-project
 BugReports: https://github.com/ladislav-hovan/manticore-project/issues
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.0

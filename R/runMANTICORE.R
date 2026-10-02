@@ -1,5 +1,3 @@
-# TODO: Update documentation to reflect renaming and extra functionality
-
 #' @title Run SCORPION across cell groups and return combined networks
 #' @description Builds per-group regulatory networks by running \code{\link{scorpion}} on subsets of cells defined by \code{cellsMetadata} and combining the resulting networks into a wide-format data frame where each column corresponds to a network.
 #' @author Daniel Osorio <daniecos@uio.no>

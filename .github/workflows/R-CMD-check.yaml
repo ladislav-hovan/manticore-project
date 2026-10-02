@@ -1,7 +1,7 @@
 # Continuous integration: R CMD check on Linux, macOS and Windows.
 on:
   push:
-    branches: [main, master]
+    branches: [ main ]
   pull_request:
   workflow_dispatch:
 
@@ -23,11 +23,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,  r: 'release'}
-          - {os: ubuntu-latest,  r: 'oldrel-1'}
+          - { os: macos-latest,   r: 'release' }
+          - { os: windows-latest, r: 'release' }
+          - { os: ubuntu-latest,  r: 'devel',   http-user-agent: 'release' }
+          - { os: ubuntu-latest,  r: 'release' }
+          - { os: ubuntu-latest,  r: 'oldrel-1' }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -65,6 +65,6 @@ jobs:
         run: |
           options(testthat.progress.max_fails = Inf)
           install.packages(".", repos = NULL, type = "source")
-          testthat::test_dir("tests/testthat", package = "SCORPION", load_package = "installed",
-                             stop_on_failure = TRUE,
-                             reporter = testthat::ProgressReporter$new(show_praise = FALSE))
+          testthat::test_dir("tests/testthat", package = "SCORPION",
+            load_package = "installed", stop_on_failure = TRUE,
+            reporter = testthat::ProgressReporter$new(show_praise = FALSE))
