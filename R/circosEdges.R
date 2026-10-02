@@ -100,30 +100,31 @@
 #' @importFrom cli cli_abort cli_alert_info cli_alert_success cli_alert_warning
 #' @importFrom grDevices adjustcolor hcl.colors
 #' @importFrom graphics legend
-circosEdges <- function(edgesDF,
-                        species = "hsapiens_gene_ensembl",
-                        geneCoords = NULL,
-                        priorNet = NULL,
-                        geneSets = NULL,
-                        pAdjThreshold = 0.05,
-                        log2FCThreshold = 0,
-                        maxEdges = 500L,
-                        colorBy = "log2FoldChange",
-                        linkColors = c("#2166AC", "#F7F7F7", "#B2182B"),
-                        lwdRange = c(0.5, 4),
-                        nmaxTF = 20L,
-                        nmaxTarget = 20L,
-                        knownColor = "grey60",
-                        novelColor = "#D95F02",
-                        geneSetColors = NULL,
-                        chromosomes = NULL,
-                        mainChromosomesOnly = TRUE,
-                        ensemblMirror = "www",
-                        transparency = 0.5,
-                        hRatio = 0.6,
-                        fontFamily = "sans",
-                        legend = TRUE) {
-
+circosEdges <- function(
+  edgesDF,
+  species = "hsapiens_gene_ensembl",
+  geneCoords = NULL,
+  priorNet = NULL,
+  geneSets = NULL,
+  pAdjThreshold = 0.05,
+  log2FCThreshold = 0,
+  maxEdges = 500L,
+  colorBy = "log2FoldChange",
+  linkColors = c("#2166AC", "#F7F7F7", "#B2182B"),
+  lwdRange = c(0.5, 4),
+  nmaxTF = 20L,
+  nmaxTarget = 20L,
+  knownColor = "grey60",
+  novelColor = "#D95F02",
+  geneSetColors = NULL,
+  chromosomes = NULL,
+  mainChromosomesOnly = TRUE,
+  ensemblMirror = "www",
+  transparency = 0.5,
+  hRatio = 0.6,
+  fontFamily = "sans",
+  legend = TRUE
+) {
   if (!requireNamespace("circlize", quietly = TRUE)) {
     cli::cli_abort(c(
       "Package {.pkg circlize} is required to draw Circos plots.",

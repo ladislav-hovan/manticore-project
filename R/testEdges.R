@@ -148,33 +148,34 @@
 #' }
 #' @export
 #' @importFrom stats pt p.adjust var sd qnorm pnorm mad median
-testEdges <- function(networksDF,
-                      testType = c("single", "two.sample"),
-                      group1,
-                      group2 = NULL,
-                      paired = FALSE,
-                      alternative = c("two.sided", "greater", "less"),
-                      padjustMethod = "BH",
-                      minLog2FC = 0,
-                      moderateVariance = TRUE,
-                      empiricalNull = TRUE,
-                      nCores = 1L,
-                      batchSize = NULL) {
-  
+testEdges <- function(
+  networksDF,
+  testType = c("single", "two.sample"),
+  group1,
+  group2 = NULL,
+  paired = FALSE,
+  alternative = c("two.sided", "greater", "less"),
+  padjustMethod = "BH",
+  minLog2FC = 0,
+  moderateVariance = TRUE,
+  empiricalNull = TRUE,
+  nCores = 1L,
+  batchSize = NULL
+) {
   testType <- match.arg(testType)
   alternative <- match.arg(alternative)
-  
+
   if (missing(group1) || is.null(group1)) {
     cli::cli_abort("group1 must be specified")
   }
-  
+
   if (!all(group1 %in% colnames(networksDF))) {
     missing_cols <- setdiff(group1, colnames(networksDF))
     cli::cli_abort(
       "Some group1 columns not found in networksDF: {paste(missing_cols, collapse = ', ')}"
     )
   }
-  
+
   if (testType == "two.sample") {
     if (is.null(group2)) {
       cli::cli_abort("group2 must be specified for two.sample test")
@@ -191,18 +192,18 @@ testEdges <- function(networksDF,
       )
     }
   }
-  
+
   if (paired && testType == "single") {
     cli::cli_abort("Paired tests require testType = 'two.sample'")
   }
-  
+
   nCores <- as.integer(nCores)
   if (length(nCores) != 1 || is.na(nCores) || nCores < 1L) {
     cli::cli_abort(
       "{.arg nCores} must be a positive integer, got {.val {nCores}}"
     )
   }
-  
+
   if (!is.null(batchSize)) {
     batchSize <- as.integer(batchSize)
     if (length(batchSize) != 1 || is.na(batchSize) || batchSize < 1L) {
@@ -211,7 +212,7 @@ testEdges <- function(networksDF,
       )
     }
   }
-  
+
   if (nCores > 1L) {
     if (!requireNamespace("furrr", quietly = TRUE) ||
         !requireNamespace("future", quietly = TRUE)) {
@@ -222,20 +223,20 @@ testEdges <- function(networksDF,
       ))
     }
   }
-  
+
   tf_col <- which(colnames(networksDF) == "tf")
   target_col <- which(colnames(networksDF) == "target")
-  
+
   if (length(tf_col) == 0 || length(target_col) == 0) {
     cli::cli_abort("networksDF must contain 'tf' and 'target' columns")
   }
-  
+
   n_edges <- nrow(networksDF)
-  
+
   cli::cli_alert_info(
     "Testing {n_edges} edges ({testType} test{if (paired) ', paired' else ''})"
   )
-  
+
   s0 <- NULL
   if (moderateVariance && nCores > 1L) {
     s0 <- .computeGlobalS0(
@@ -246,7 +247,7 @@ testEdges <- function(networksDF,
       paired = paired
     )
   }
-  
+
   if (testType == "single") {
     .helperFn <- testEdgesSingle
     .helperArgs <- list(
@@ -276,7 +277,7 @@ testEdges <- function(networksDF,
       s0 = s0
     )
   }
-  
+
   if (nCores == 1L) {
     results <- do.call(
       .helperFn,
@@ -286,38 +287,38 @@ testEdges <- function(networksDF,
     if (is.null(batchSize)) {
       batchSize <- ceiling(n_edges / nCores)
     }
-    
+
     cli::cli_alert_info(
       "Using {nCores} workers, batch size {batchSize}"
     )
-    
+
     batch_indices <- split(
       seq_len(n_edges),
       ceiling(seq_len(n_edges) / batchSize)
     )
-    
+
     chunks <- lapply(
       batch_indices,
       function(idx) networksDF[idx, , drop = FALSE]
     )
-    
+
     old_maxsize <- getOption("future.globals.maxSize")
     options(future.globals.maxSize = Inf)
     on.exit(
       options(future.globals.maxSize = old_maxsize),
       add = TRUE
     )
-    
+
     old_plan <- future::plan(
       future::multisession,
       workers = nCores
     )
-    
+
     on.exit({
       future::plan(future::sequential)
       future::plan(old_plan)
     }, add = TRUE)
-    
+
     results <- furrr::future_map_dfr(
       chunks,
       function(chunk) {
@@ -328,28 +329,28 @@ testEdges <- function(networksDF,
       },
       .options = furrr::furrr_options(seed = NULL)
     )
-    
+
     future::plan(future::sequential)
     future::plan(old_plan)
     options(future.globals.maxSize = old_maxsize)
     on.exit()
   }
-  
+
   # Apply empirical null correction
   if (empiricalNull) {
     t_stats <- results$tStatistic
     valid_idx <- !is.na(t_stats) & is.finite(t_stats)
-    
+
     if (sum(valid_idx) > 100) {
       null_center <- median(t_stats[valid_idx])
       null_scale <- mad(
         t_stats[valid_idx],
         constant = 1.4826
       )
-      
+
       if (null_scale > 0) {
         z_stats <- (t_stats - null_center) / null_scale
-        
+
         results$pValue <- switch(
           alternative,
           "two.sided" = 2 * pnorm(
@@ -368,18 +369,18 @@ testEdges <- function(networksDF,
       }
     }
   }
-  
+
   results$pAdj <- p.adjust(
     results$pValue,
     method = padjustMethod
   )
-  
+
   rownames(results) <- NULL
-  
+
   cli::cli_alert_success(
     "Tested {nrow(results)} edges"
   )
-  
+
   return(results)
 }
 
@@ -394,113 +395,113 @@ testEdges <- function(networksDF,
     group1,
     group2,
     paired) {
-  
+
   if (testType == "single") {
-    
+
     edge_matrix <- as.matrix(
       networksDF[, group1, drop = FALSE]
     )
-    
+
     meanEdge <- rowMeans(
       edge_matrix,
       na.rm = TRUE
     )
-    
+
     n_valid <- rowSums(
       !is.na(edge_matrix)
     )
-    
+
     row_mean_sq <- rowMeans(
       edge_matrix^2,
       na.rm = TRUE
     )
-    
+
     sd_edge <- sqrt(
       n_valid / (n_valid - 1) *
         (row_mean_sq - meanEdge^2)
     )
-    
+
     se <- sd_edge / sqrt(n_valid)
-    
+
   } else if (paired) {
-    
+
     edge_matrix1 <- as.matrix(
       networksDF[, group1, drop = FALSE]
     )
-    
+
     edge_matrix2 <- as.matrix(
       networksDF[, group2, drop = FALSE]
     )
-    
+
     diff_matrix <- edge_matrix1 - edge_matrix2
-    
+
     diffMean <- rowMeans(
       diff_matrix,
       na.rm = TRUE
     )
-    
+
     valid_pairs <- !is.na(edge_matrix1) &
       !is.na(edge_matrix2)
-    
+
     n_valid <- rowSums(valid_pairs)
-    
+
     diff_mean_sq <- rowMeans(
       diff_matrix^2,
       na.rm = TRUE
     )
-    
+
     sd_diff <- sqrt(
       n_valid / (n_valid - 1) *
         (diff_mean_sq - diffMean^2)
     )
-    
+
     se <- sd_diff / sqrt(n_valid)
-    
+
   } else {
-    
+
     edge_matrix1 <- as.matrix(
       networksDF[, group1, drop = FALSE]
     )
-    
+
     edge_matrix2 <- as.matrix(
       networksDF[, group2, drop = FALSE]
     )
-    
+
     meanEdge1 <- rowMeans(
       edge_matrix1,
       na.rm = TRUE
     )
-    
+
     meanEdge2 <- rowMeans(
       edge_matrix2,
       na.rm = TRUE
     )
-    
+
     n1 <- rowSums(!is.na(edge_matrix1))
     n2 <- rowSums(!is.na(edge_matrix2))
-    
+
     row_mean_sq1 <- rowMeans(
       edge_matrix1^2,
       na.rm = TRUE
     )
-    
+
     row_mean_sq2 <- rowMeans(
       edge_matrix2^2,
       na.rm = TRUE
     )
-    
+
     var1 <- n1 / (n1 - 1) *
       (row_mean_sq1 - meanEdge1^2)
-    
+
     var2 <- n2 / (n2 - 1) *
       (row_mean_sq2 - meanEdge2^2)
-    
+
     se <- sqrt(
       var1 / n1 +
         var2 / n2
     )
   }
-  
+
   median(
     se,
     na.rm = TRUE
@@ -518,47 +519,47 @@ testEdgesSingle <- function(
     alternative,
     moderateVariance = TRUE,
     s0 = NULL) {
-  
+
   edge_data <- networksDF[
     ,
     group1,
     drop = FALSE
   ]
-  
+
   edge_matrix <- as.matrix(edge_data)
-  
+
   meanEdge <- rowMeans(
     edge_matrix,
     na.rm = TRUE
   )
-  
+
   tf_target <- networksDF[
     ,
     c("tf", "target")
   ]
-  
+
   n_samples <- ncol(edge_matrix)
-  
+
   n_valid <- rowSums(
     !is.na(edge_matrix)
   )
-  
+
   row_mean_sq <- rowMeans(
     edge_matrix^2,
     na.rm = TRUE
   )
-  
+
   sd_edge <- sqrt(
     n_valid / (n_valid - 1) *
       (row_mean_sq - meanEdge^2)
   )
-  
+
   # Raw/unmoderated SE for downstream meta-analysis
   rawSE <- sd_edge / sqrt(n_valid)
-  
+
   # SE used for hypothesis testing
   se <- rawSE
-  
+
   if (moderateVariance) {
     if (is.null(s0)) {
       s0 <- median(
@@ -566,14 +567,14 @@ testEdgesSingle <- function(
         na.rm = TRUE
       )
     }
-    
+
     se <- rawSE + s0
   }
-  
+
   test_stats <- meanEdge / se
-  
+
   df <- n_valid - 1
-  
+
   pvalues <- switch(
     alternative,
     "two.sided" = 2 * pt(
@@ -592,16 +593,16 @@ testEdgesSingle <- function(
       lower.tail = TRUE
     )
   )
-  
+
   insufficient_data <-
     n_valid < 2 |
     is.na(sd_edge) |
     (!moderateVariance & sd_edge == 0)
-  
+
   test_stats[insufficient_data] <- NA
   pvalues[insufficient_data] <- NA
   rawSE[insufficient_data] <- NA
-  
+
   results <- data.frame(
     tf = tf_target$tf,
     target = tf_target$target,
@@ -611,7 +612,7 @@ testEdgesSingle <- function(
     pValue = pvalues,
     stringsAsFactors = FALSE
   )
-  
+
   return(results)
 }
 
@@ -628,98 +629,98 @@ testEdgesTwoSample <- function(
     minLog2FC,
     moderateVariance = TRUE,
     s0 = NULL) {
-  
+
   edge_data1 <- networksDF[
     ,
     group1,
     drop = FALSE
   ]
-  
+
   edge_data2 <- networksDF[
     ,
     group2,
     drop = FALSE
   ]
-  
+
   edge_matrix1 <- as.matrix(edge_data1)
   edge_matrix2 <- as.matrix(edge_data2)
-  
+
   meanEdge1 <- rowMeans(
     edge_matrix1,
     na.rm = TRUE
   )
-  
+
   meanEdge2 <- rowMeans(
     edge_matrix2,
     na.rm = TRUE
   )
-  
+
   meanEdge <- (
     meanEdge1 + meanEdge2
   ) / 2
-  
+
   diffMean <- meanEdge1 - meanEdge2
-  
+
   log2FC <- meanEdge1 - meanEdge2
-  
+
   keep_idx <- abs(log2FC) >= minLog2FC
-  
+
   edge_matrix1 <- edge_matrix1[
     keep_idx,
     ,
     drop = FALSE
   ]
-  
+
   edge_matrix2 <- edge_matrix2[
     keep_idx,
     ,
     drop = FALSE
   ]
-  
+
   meanEdge1 <- meanEdge1[keep_idx]
   meanEdge2 <- meanEdge2[keep_idx]
   meanEdge <- meanEdge[keep_idx]
   diffMean <- diffMean[keep_idx]
   log2FC <- log2FC[keep_idx]
-  
+
   tf_target <- networksDF[
     keep_idx,
     c("tf", "target")
   ]
-  
+
   n1 <- rowSums(
     !is.na(edge_matrix1)
   )
-  
+
   n2 <- rowSums(
     !is.na(edge_matrix2)
   )
-  
+
   row_mean_sq1 <- rowMeans(
     edge_matrix1^2,
     na.rm = TRUE
   )
-  
+
   row_mean_sq2 <- rowMeans(
     edge_matrix2^2,
     na.rm = TRUE
   )
-  
+
   var1 <- n1 / (n1 - 1) *
     (row_mean_sq1 - meanEdge1^2)
-  
+
   var2 <- n2 / (n2 - 1) *
     (row_mean_sq2 - meanEdge2^2)
-  
+
   # Raw Welch SE
   rawSE <- sqrt(
     var1 / n1 +
       var2 / n2
   )
-  
+
   # SE used for hypothesis testing
   se <- rawSE
-  
+
   if (moderateVariance) {
     if (is.null(s0)) {
       s0 <- median(
@@ -727,12 +728,12 @@ testEdgesTwoSample <- function(
         na.rm = TRUE
       )
     }
-    
+
     se <- rawSE + s0
   }
-  
+
   test_stats <- diffMean / se
-  
+
   df <- (
     var1 / n1 +
       var2 / n2
@@ -740,7 +741,7 @@ testEdgesTwoSample <- function(
     (var1 / n1)^2 / (n1 - 1) +
       (var2 / n2)^2 / (n2 - 1)
   )
-  
+
   pvalues <- switch(
     alternative,
     "two.sided" = 2 * pt(
@@ -759,9 +760,9 @@ testEdgesTwoSample <- function(
       lower.tail = TRUE
     )
   )
-  
+
   se_before_mod <- rawSE
-  
+
   insufficient_data <-
     n1 < 2 |
     n2 < 2 |
@@ -776,28 +777,28 @@ testEdgesTwoSample <- function(
         )
     ) |
     is.na(rawSE)
-  
+
   test_stats[insufficient_data] <- NA
   pvalues[insufficient_data] <- NA
   df[insufficient_data] <- NA
   rawSE[insufficient_data] <- NA
-  
+
   pooled_var <- (
     (n1 - 1) * var1 +
       (n2 - 1) * var2
   ) / (
     n1 + n2 - 2
   )
-  
+
   pooled_sd <- sqrt(pooled_var)
-  
+
   cohensD <- diffMean / pooled_sd
-  
+
   cohensD[
     pooled_sd == 0 |
       is.na(pooled_sd)
   ] <- NA
-  
+
   results <- data.frame(
     tf = tf_target$tf,
     target = tf_target$target,
@@ -811,7 +812,7 @@ testEdgesTwoSample <- function(
     pValue = pvalues,
     stringsAsFactors = FALSE
   )
-  
+
   return(results)
 }
 
@@ -828,98 +829,98 @@ testEdgesPaired <- function(
     minLog2FC,
     moderateVariance = TRUE,
     s0 = NULL) {
-  
+
   edge_data1 <- networksDF[
     ,
     group1,
     drop = FALSE
   ]
-  
+
   edge_data2 <- networksDF[
     ,
     group2,
     drop = FALSE
   ]
-  
+
   edge_matrix1 <- as.matrix(edge_data1)
   edge_matrix2 <- as.matrix(edge_data2)
-  
+
   meanEdge1 <- rowMeans(
     edge_matrix1,
     na.rm = TRUE
   )
-  
+
   meanEdge2 <- rowMeans(
     edge_matrix2,
     na.rm = TRUE
   )
-  
+
   meanEdge <- (
     meanEdge1 + meanEdge2
   ) / 2
-  
+
   diff_matrix <- edge_matrix1 - edge_matrix2
-  
+
   diffMean <- rowMeans(
     diff_matrix,
     na.rm = TRUE
   )
-  
+
   log2FC <- meanEdge1 - meanEdge2
-  
+
   keep_idx <- abs(log2FC) >= minLog2FC
-  
+
   diff_matrix <- diff_matrix[
     keep_idx,
     ,
     drop = FALSE
   ]
-  
+
   edge_matrix1 <- edge_matrix1[
     keep_idx,
     ,
     drop = FALSE
   ]
-  
+
   edge_matrix2 <- edge_matrix2[
     keep_idx,
     ,
     drop = FALSE
   ]
-  
+
   meanEdge1 <- meanEdge1[keep_idx]
   meanEdge2 <- meanEdge2[keep_idx]
   meanEdge <- meanEdge[keep_idx]
   diffMean <- diffMean[keep_idx]
   log2FC <- log2FC[keep_idx]
-  
+
   tf_target <- networksDF[
     keep_idx,
     c("tf", "target")
   ]
-  
+
   valid_pairs <- !is.na(edge_matrix1) &
     !is.na(edge_matrix2)
-  
+
   n_valid <- rowSums(valid_pairs)
-  
+
   diff_mean_sq <- rowMeans(
     diff_matrix^2,
     na.rm = TRUE
   )
-  
+
   sd_diff <- sqrt(
     n_valid / (n_valid - 1) *
       (diff_mean_sq - diffMean^2)
   )
-  
+
   # FIX:
   # Preserve the raw paired SE before variance moderation.
   rawSE <- sd_diff / sqrt(n_valid)
-  
+
   # SE used for hypothesis testing
   se <- rawSE
-  
+
   if (moderateVariance) {
     if (is.null(s0)) {
       s0 <- median(
@@ -927,14 +928,14 @@ testEdgesPaired <- function(
         na.rm = TRUE
       )
     }
-    
+
     se <- rawSE + s0
   }
-  
+
   test_stats <- diffMean / se
-  
+
   df <- n_valid - 1
-  
+
   pvalues <- switch(
     alternative,
     "two.sided" = 2 * pt(
@@ -953,23 +954,23 @@ testEdgesPaired <- function(
       lower.tail = TRUE
     )
   )
-  
+
   insufficient_data <-
     n_valid < 2 |
     is.na(sd_diff) |
     (!moderateVariance & sd_diff == 0)
-  
+
   test_stats[insufficient_data] <- NA
   pvalues[insufficient_data] <- NA
   rawSE[insufficient_data] <- NA
-  
+
   cohensD <- diffMean / sd_diff
-  
+
   cohensD[
     sd_diff == 0 |
       is.na(sd_diff)
   ] <- NA
-  
+
   results <- data.frame(
     tf = tf_target$tf,
     target = tf_target$target,
@@ -983,6 +984,6 @@ testEdgesPaired <- function(
     pValue = pvalues,
     stringsAsFactors = FALSE
   )
-  
+
   return(results)
 }

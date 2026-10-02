@@ -1,4 +1,12 @@
-prepResult <- function(zScale, output, regulatoryNetwork, geneCoreg, tfCoopNetwork, edgelist, motif) {
+prepResult <- function(
+  zScale,
+  output,
+  regulatoryNetwork,
+  geneCoreg,
+  tfCoopNetwork,
+  edgelist,
+  motif
+) {
   # Coerce to base R dense matrices so the returned classes are consistent
   # regardless of assocMethod (e.g. pcNet yields an S4 Matrix, pearson a base matrix)
   regulatoryNetwork <- as.matrix(regulatoryNetwork)

@@ -107,23 +107,25 @@
 #' # $ numGenes: int 281
 #' # $ numTFs  : int 963
 #' # $ numEdges: int 270603
-scorpion <- function(tfMotifs = NULL,
-                     gexMatrix,
-                     ppiNet = NULL,
-                     computingEngine = "cpu",
-                     nCores = 1,
-                     gammaValue = 10,
-                     nPC = 25,
-                     assocMethod = "pearson",
-                     alphaValue = 0.1,
-                     hammingValue = 0.001,
-                     nIter = Inf,
-                     outNet = c("regNet", "coregNet", "coopNet"),
-                     zScaling = TRUE,
-                     showProgress = TRUE,
-                     randomizationMethod = "None",
-                     scaleByPresent = FALSE,
-                     filterExpr = FALSE) {
+scorpion <- function(
+  tfMotifs = NULL,
+  gexMatrix,
+  ppiNet = NULL,
+  computingEngine = "cpu",
+  nCores = 1,
+  gammaValue = 10,
+  nPC = 25,
+  assocMethod = "pearson",
+  alphaValue = 0.1,
+  hammingValue = 0.001,
+  nIter = Inf,
+  outNet = c("regNet", "coregNet", "coopNet"),
+  zScaling = TRUE,
+  showProgress = TRUE,
+  randomizationMethod = "None",
+  scaleByPresent = FALSE,
+  filterExpr = FALSE
+) {
   # Input validation
   if (!is.numeric(alphaValue) || alphaValue < 0 || alphaValue > 1) {
     cli::cli_abort("alphaValue must be a numeric value between 0 and 1")

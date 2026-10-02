@@ -90,11 +90,12 @@
 #' }
 #' @export
 #' @importFrom stats pf p.adjust
-regressEdges <- function(networksDF,
-                         orderedGroups,
-                         padjustMethod = "BH",
-                         minMeanEdge = 0) {
-
+regressEdges <- function(
+  networksDF,
+  orderedGroups,
+  padjustMethod = "BH",
+  minMeanEdge = 0
+) {
   # Input validation
   if (missing(orderedGroups) || is.null(orderedGroups)) {
     cli::cli_abort("orderedGroups must be specified")

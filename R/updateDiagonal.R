@@ -1,4 +1,9 @@
-update.diagonal <- function(diagMat, num, alpha, step) {
+update.diagonal <- function(
+  diagMat,
+  num,
+  alpha,
+  step
+) {
   diag(diagMat) <- NaN
   # Use column standard deviation to match Python implementation
   diagstd <- colSds(diagMat, na.rm = TRUE)

@@ -1,4 +1,7 @@
-adj_library_size <- function(X, librarySize = colSums(X)) {
+adj_library_size <- function(
+  X,
+  librarySize = colSums(X)
+) {
   # Design matrix
   H <- model.matrix(~librarySize)
 

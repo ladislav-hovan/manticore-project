@@ -67,11 +67,13 @@
 #' }
 #' @export
 #' @importFrom stats p.adjust
-enrichEdges <- function(edgesDF,
-                        geneSets,
-                        numericValue,
-                        nCores = 3,
-                        seed = 1) {
+enrichEdges <- function(
+  edgesDF,
+  geneSets,
+  numericValue,
+  nCores = 3,
+  seed = 1
+) {
   if (!requireNamespace("fgsea", quietly = TRUE)) {
     stop(
       "Package 'fgsea' (Bioconductor) is required for enrichEdges(). ",

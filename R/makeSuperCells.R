@@ -2,26 +2,28 @@
 #' @importFrom irlba irlba
 #' @importFrom igraph cluster_walktrap cut_at cluster_louvain contract simplify
 #' @import Matrix
-makeSuperCells <- function(X,
-                           genes.use = NULL,
-                           genes.exclude = NULL,
-                           n.var.genes = min(1000, nrow(X)),
-                           gamma = 10,
-                           k.knn = 5,
-                           do.scale = TRUE,
-                           n.pc = 25,
-                           fast.pca = TRUE,
-                           do.approx = FALSE,
-                           approx.N = 20000,
-                           directed = FALSE,
-                           use.nn2 = TRUE,
-                           seed = 12345,
-                           igraph.clustering = c("walktrap", "louvain"),
-                           return.singlecell.NW = TRUE,
-                           return.hierarchical.structure = TRUE,
-                           block.size = 10000,
-                           weights = NULL,
-                           do.median.norm = FALSE) {
+makeSuperCells <- function(
+  X,
+  genes.use = NULL,
+  genes.exclude = NULL,
+  n.var.genes = min(1000, nrow(X)),
+  gamma = 10,
+  k.knn = 5,
+  do.scale = TRUE,
+  n.pc = 25,
+  fast.pca = TRUE,
+  do.approx = FALSE,
+  approx.N = 20000,
+  directed = FALSE,
+  use.nn2 = TRUE,
+  seed = 12345,
+  igraph.clustering = c("walktrap", "louvain"),
+  return.singlecell.NW = TRUE,
+  return.hierarchical.structure = TRUE,
+  block.size = 10000,
+  weights = NULL,
+  do.median.norm = FALSE
+) {
   N.c <- ncol(X)
   GE <- X
 

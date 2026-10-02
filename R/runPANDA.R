@@ -1,10 +1,26 @@
 #' @import cli
 #' @importFrom utils getFromNamespace
-runPANDA <- function(motif = NULL, expr = NULL, ppi = NULL, alpha = 0.1, hamming = 0.001, n.cores = 1,
-                     iter = NA, output = c("regulatory", "coexpression", "cooperative"),
-                     zScale = TRUE, progress = TRUE, randomize = c("None", "within.gene", "by.gene"), assoc.method = "pearson",
-                     scale.by.present = FALSE, edgelist = FALSE, remove.missing.ppi = FALSE,
-                     remove.missing.motif = FALSE, remove.missing.genes = FALSE, mode = "intersection", computing.engine = "cpu") {
+runPANDA <- function(
+  motif = NULL,
+  expr = NULL,
+  ppi = NULL,
+  alpha = 0.1,
+  hamming = 0.001,
+  n.cores = 1,
+  iter = NA,
+  output = c("regulatory", "coexpression", "cooperative"),
+  zScale = TRUE,
+  progress = TRUE,
+  randomize = c("None", "within.gene", "by.gene"),
+  assoc.method = "pearson",
+  scale.by.present = FALSE,
+  edgelist = FALSE,
+  remove.missing.ppi = FALSE,
+  remove.missing.motif = FALSE,
+  remove.missing.genes = FALSE,
+  mode = "intersection",
+  computing.engine = "cpu"
+) {
   randomize <- match.arg(randomize)
   if (progress) {
     cli::cli_alert_success("Initializing and validating")
@@ -257,5 +273,6 @@ runPANDA <- function(motif = NULL, expr = NULL, ppi = NULL, alpha = 0.1, hamming
   dimnames(geneCoreg) <- list(gene.names, gene.names)
   dimnames(tfCoopNetwork) <- list(tf.names, tf.names)
   result <- prepResult(zScale, output, regulatoryNetwork, geneCoreg, tfCoopNetwork, edgelist, motif)
+
   return(result)
 }

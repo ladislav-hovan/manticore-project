@@ -1,6 +1,10 @@
-tanimoto <- function(X, Y = NULL,
-                     x_norm_sq = NULL, y_norm_sq = NULL,
-                     type = c("general", "tcrossprod", "crossprod")) {
+tanimoto <- function(
+  X,
+  Y = NULL,
+  x_norm_sq = NULL,
+  y_norm_sq = NULL,
+  type = c("general", "tcrossprod", "crossprod")
+) {
   type <- match.arg(type)
 
   if (type == "tcrossprod") {

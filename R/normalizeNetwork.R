@@ -1,4 +1,6 @@
-normalizeNetwork <- function(X) {
+normalizeNetwork <- function(
+  X
+) {
   nr <- nrow(X)
   nc <- ncol(X)
 

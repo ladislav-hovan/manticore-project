@@ -1,12 +1,14 @@
-buildKNN <- function(X,
-                     k = 5,
-                     from = c("dist", "coordinates"),
-                     use.nn2 = TRUE,
-                     return_neighbors_order = F,
-                     dist_method = "euclidean",
-                     cor_method = "pearson",
-                     p = 2,
-                     directed = FALSE) {
+buildKNN <- function(
+  X,
+  k = 5,
+  from = c("dist", "coordinates"),
+  use.nn2 = TRUE,
+  return_neighbors_order = F,
+  dist_method = "euclidean",
+  cor_method = "pearson",
+  p = 2,
+  directed = FALSE
+) {
   av.methods <- c("dist", "coordinates")
   method <- pmatch(from[1], av.methods)
   if (is.na(method)) {
