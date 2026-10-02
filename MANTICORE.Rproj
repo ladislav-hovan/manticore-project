@@ -1,5 +1,5 @@
-Version: 1.0
-ProjectId: b9113b47-bc0b-45a9-ad5d-221af6249213
+Version: 0.1
+ProjectId:
 
 RestoreWorkspace: Default
 SaveWorkspace: Default
@@ -13,7 +13,7 @@ Encoding: UTF-8
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
 
-AutoAppendNewline: Yes
+AutoAppendNewline: No
 StripTrailingWhitespace: Yes
 
 BuildType: Package

@@ -1,3 +1,5 @@
+# TODO: Update documentation to reflect renaming and extra functionality
+
 #' @title Run SCORPION across cell groups and return combined networks
 #' @description Builds per-group regulatory networks by running \code{\link{scorpion}} on subsets of cells defined by \code{cellsMetadata} and combining the resulting networks into a wide-format data frame where each column corresponds to a network.
 #' @author Daniel Osorio <daniecos@uio.no>
@@ -193,29 +195,30 @@
 #' @importFrom cli cli_h1 cli_alert_success cli_alert_info cli_abort cli_progress_along
 #' @importFrom furrr future_map furrr_options
 #' @importFrom future plan multisession sequential
-runSCORPION <- function(gexMatrix,
-                        tfMotifs,
-                        ppiNet,
-                        cellsMetadata,
-                        groupBy,
-                        normalizeData = TRUE,
-                        removeBatchEffect = FALSE,
-                        batch = NULL,
-                        minCells = 30,
-                        computingEngine = "cpu",
-                        nCores = 1,
-                        gammaValue = 10,
-                        nPC = 25,
-                        assocMethod = "pearson",
-                        alphaValue = 0.1,
-                        hammingValue = 0.001,
-                        nIter = Inf,
-                        outNet = "regNet",
-                        zScaling = TRUE,
-                        showProgress = TRUE,
-                        randomizationMethod = "None",
-                        scaleByPresent = FALSE,
-                        filterExpr = FALSE
+runMANTICORE <- function(
+  gexMatrix,
+  tfMotifs,
+  ppiNet,
+  cellsMetadata,
+  groupBy,
+  normalizeData = TRUE,
+  removeBatchEffect = FALSE,
+  batch = NULL,
+  minCells = 30,
+  computingEngine = "cpu",
+  nCores = 1,
+  gammaValue = 10,
+  nPC = 25,
+  assocMethod = "pearson",
+  alphaValue = 0.1,
+  hammingValue = 0.001,
+  nIter = Inf,
+  outNet = "regNet",
+  zScaling = TRUE,
+  showProgress = TRUE,
+  randomizationMethod = "None",
+  scaleByPresent = FALSE,
+  filterExpr = FALSE
 ) {
   # Input validation
   if (ncol(gexMatrix) != nrow(cellsMetadata)) {
@@ -501,5 +504,6 @@ runSCORPION <- function(gexMatrix,
   if (showProgress) {
     cli::cli_alert_success("Networks successfully combined")
   }
+
   return(networks)
 }
