@@ -65,6 +65,6 @@ jobs:
         run: |
           options(testthat.progress.max_fails = Inf)
           install.packages(".", repos = NULL, type = "source")
-          testthat::test_dir("tests/testthat", package = "SCORPION",
+          testthat::test_dir("tests/testthat", package = "MANTICORE",
             load_package = "installed", stop_on_failure = TRUE,
             reporter = testthat::ProgressReporter$new(show_praise = FALSE))
