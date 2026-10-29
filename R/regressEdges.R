@@ -1,9 +1,9 @@
 #' @title Regression analysis of edges across ordered conditions
-#' @description Performs linear regression on network edges from runSCORPION output
+#' @description Performs linear regression on network edges from runMANTICORE output
 #' to identify edges that show significant trends across ordered conditions (e.g.,
 #' disease progression: Normal -> Border -> Tumor).
 #' @author Daniel Osorio <daniecos@uio.no>
-#' @param networksDF A data.frame output from \code{\link{runSCORPION}} containing
+#' @param networksDF A data.frame output from \code{\link{runMANTICORE}} containing
 #'   TF-target pairs as rows and network identifiers as columns.
 #' @param orderedGroups A named list where each element is a character vector of
 #'   column names in \code{networksDF}. Names represent ordered conditions
@@ -45,7 +45,7 @@
 #' # Load test data and build networks by donor and region
 #' # Note: T = Tumor, N = Normal, B = Border regions
 #' data(scorpionTest)
-#' nets <- runSCORPION(
+#' nets <- runMANTICORE(
 #'   gexMatrix = scorpionTest$gex,
 #'   tfMotifs = scorpionTest$tf,
 #'   ppiNet = scorpionTest$ppi,

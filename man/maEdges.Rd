@@ -62,7 +62,7 @@ study. A TF-target pair is only counted as contributing to a study when both
 its effect size and SE are valid.
 }
 \seealso{
-\code{\link{runSCORPION}}, \code{\link{testEdges}}, \code{\link{circosEdges}}
+\code{\link{runMANTICORE}}, \code{\link{testEdges}}, \code{\link{circosEdges}}
 }
 \author{
 Daniel Osorio <daniecos@uio.no>

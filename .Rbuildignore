@@ -7,3 +7,5 @@ tests/*
 ^\.positai$
 ^\.claude$
 ^\.github$
+.pixi/*
+pixi.toml

@@ -131,7 +131,7 @@ Requires the \pkg{circlize} package, and \pkg{biomaRt} when gene
 \examples{
 \dontrun{
 data(scorpionTest)
-nets <- runSCORPION(
+nets <- runMANTICORE(
   gexMatrix = scorpionTest$gex,
   tfMotifs = scorpionTest$tf,
   ppiNet = scorpionTest$ppi,
@@ -155,7 +155,7 @@ circosEdges(
 }
 }
 \seealso{
-\code{\link{testEdges}}, \code{\link{runSCORPION}}
+\code{\link{testEdges}}, \code{\link{runMANTICORE}}
 }
 \author{
 Daniel Osorio <daniecos@uio.no>

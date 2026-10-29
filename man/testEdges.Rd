@@ -20,7 +20,7 @@ testEdges(
 )
 }
 \arguments{
-\item{networksDF}{A data.frame output from \code{\link{runSCORPION}} containing
+\item{networksDF}{A data.frame output from \code{\link{runMANTICORE}} containing
 TF-target pairs as rows and network identifiers as columns.}
 
 \item{testType}{Character specifying the test type. Options are:
@@ -89,7 +89,7 @@ A data.frame containing:
   }
 }
 \description{
-Performs statistical testing of network edges from runSCORPION output.
+Performs statistical testing of network edges from runMANTICORE output.
 Supports single-sample tests (testing if edges differ from zero) and two-sample
 tests (comparing edges between two groups).
 }
@@ -122,7 +122,7 @@ calculated using matrix operations without iteration.
 # Load test data and build networks by donor and region
 # Note: T = Tumor, N = Normal, B = Border regions
 data(scorpionTest)
-nets <- runSCORPION(
+nets <- runMANTICORE(
   gexMatrix = scorpionTest$gex,
   tfMotifs = scorpionTest$tf,
   ppiNet = scorpionTest$ppi,
@@ -182,7 +182,7 @@ results_paired <- testEdges(
 }
 }
 \seealso{
-\code{\link{runSCORPION}}, \code{\link{maEdges}}, \code{\link{circosEdges}}
+\code{\link{runMANTICORE}}, \code{\link{maEdges}}, \code{\link{circosEdges}}
 }
 \author{
 Daniel Osorio <daniecos@uio.no>

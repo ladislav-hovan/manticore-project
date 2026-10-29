@@ -1,11 +1,11 @@
 #' @importFrom stats t.test p.adjust pf model.matrix
 #' @importFrom cli cli_alert_info cli_alert_success cli_abort
 #' @title Test edges from SCORPION networks
-#' @description Performs statistical testing of network edges from runSCORPION output.
+#' @description Performs statistical testing of network edges from runMANTICORE output.
 #' Supports single-sample tests (testing if edges differ from zero) and two-sample
 #' tests (comparing edges between two groups).
 #' @author Daniel Osorio <daniecos@uio.no>
-#' @param networksDF A data.frame output from \code{\link{runSCORPION}} containing
+#' @param networksDF A data.frame output from \code{\link{runMANTICORE}} containing
 #'   TF-target pairs as rows and network identifiers as columns.
 #' @param testType Character specifying the test type. Options are:
 #'   \itemize{
@@ -88,7 +88,7 @@
 #' # Load test data and build networks by donor and region
 #' # Note: T = Tumor, N = Normal, B = Border regions
 #' data(scorpionTest)
-#' nets <- runSCORPION(
+#' nets <- runMANTICORE(
 #'   gexMatrix = scorpionTest$gex,
 #'   tfMotifs = scorpionTest$tf,
 #'   ppiNet = scorpionTest$ppi,

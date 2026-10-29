@@ -7,7 +7,7 @@
 regressEdges(networksDF, orderedGroups, padjustMethod = "BH", minMeanEdge = 0)
 }
 \arguments{
-\item{networksDF}{A data.frame output from \code{\link{runSCORPION}} containing
+\item{networksDF}{A data.frame output from \code{\link{runMANTICORE}} containing
 TF-target pairs as rows and network identifiers as columns.}
 
 \item{orderedGroups}{A named list where each element is a character vector of
@@ -40,7 +40,7 @@ A data.frame containing:
   }
 }
 \description{
-Performs linear regression on network edges from runSCORPION output
+Performs linear regression on network edges from runMANTICORE output
 to identify edges that show significant trends across ordered conditions (e.g.,
 disease progression: Normal -> Border -> Tumor).
 }
@@ -60,7 +60,7 @@ The function uses vectorized computations for efficiency with large datasets.
 # Load test data and build networks by donor and region
 # Note: T = Tumor, N = Normal, B = Border regions
 data(scorpionTest)
-nets <- runSCORPION(
+nets <- runMANTICORE(
   gexMatrix = scorpionTest$gex,
   tfMotifs = scorpionTest$tf,
   ppiNet = scorpionTest$ppi,
@@ -105,7 +105,7 @@ strong_trends <- results_regression[results_regression$pAdj < 0.05 &
 }
 }
 \seealso{
-\code{\link{runSCORPION}}, \code{\link{testEdges}}
+\code{\link{runMANTICORE}}, \code{\link{testEdges}}
 }
 \author{
 Daniel Osorio <daniecos@uio.no>

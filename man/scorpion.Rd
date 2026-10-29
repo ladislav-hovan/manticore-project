@@ -151,7 +151,7 @@ str(scorpionOutput)
 # $ numEdges: int 270603
 }
 \seealso{
-\code{\link{runSCORPION}} for building networks across cell groups.
+\code{\link{runMANTICORE}} for building networks across cell groups.
 }
 \author{
 Daniel Osorio <daniecos@uio.no>

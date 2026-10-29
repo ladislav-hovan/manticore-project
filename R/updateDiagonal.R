@@ -1,4 +1,3 @@
-#' @export
 update.diagonal <- function(
   diagMat,
   num,

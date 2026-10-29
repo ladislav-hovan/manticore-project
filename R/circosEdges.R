@@ -66,7 +66,7 @@
 #'   \code{outDegree}, \code{inDegree} and total \code{degree} columns, each the
 #'   sum of \code{log2FoldChange} over a gene's outgoing / incoming links). The
 #'   function is called for the side effect of drawing the plot.
-#' @seealso \code{\link{testEdges}}, \code{\link{runSCORPION}}
+#' @seealso \code{\link{testEdges}}, \code{\link{runMANTICORE}}
 #' @details Requires the \pkg{circlize} package, and \pkg{biomaRt} when gene
 #'   coordinates are downloaded automatically (\code{geneCoords = NULL}). Genes
 #'   without coordinates, and links whose TF or target lacks coordinates, are
@@ -74,7 +74,7 @@
 #' @examples
 #' \dontrun{
 #' data(scorpionTest)
-#' nets <- runSCORPION(
+#' nets <- runMANTICORE(
 #'   gexMatrix = scorpionTest$gex,
 #'   tfMotifs = scorpionTest$tf,
 #'   ppiNet = scorpionTest$ppi,
