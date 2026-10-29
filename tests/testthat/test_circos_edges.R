@@ -62,7 +62,7 @@ test_that("circosEdges parses a GMT file", {
   ), gmt)
   on.exit(unlink(gmt), add = TRUE)
 
-  parseGMT <- getFromNamespace(".parseGMT", "SCORPION")
+  parseGMT <- getFromNamespace(".parseGMT", "MANTICORE")
   sets <- parseGMT(gmt)
   expect_named(sets, c("SET1", "SET2"))
   expect_equal(sets$SET1, c("GENEA", "GENEB", "GENEC"))
@@ -91,7 +91,7 @@ test_that("circosEdges errors on missing columns and empty selections", {
 })
 
 test_that(".orderChr sorts chromosomes naturally", {
-  orderChr <- getFromNamespace(".orderChr", "SCORPION")
+  orderChr <- getFromNamespace(".orderChr", "MANTICORE")
   expect_equal(
     orderChr(c("2", "X", "1", "MT", "10", "Y")),
     c("1", "2", "10", "X", "Y", "MT")

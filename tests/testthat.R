@@ -1,5 +1,5 @@
 # This file is required to run tests via devtools::test()
 library(testthat)
-library(SCORPION)
+library(MANTICORE)
 
-test_check("SCORPION")
+test_check("MANTICORE")
