@@ -39,7 +39,7 @@
 #'     \item{iSquared: I-squared heterogeneity (percentage)}
 #'     \item{tauSquared: DerSimonian-Laird between-study variance}
 #'   }
-#' @seealso \code{\link{runSCORPION}}, \code{\link{testEdges}}, \code{\link{circosEdges}}
+#' @seealso \code{\link{runMANTICORE}}, \code{\link{testEdges}}, \code{\link{circosEdges}}
 #' @export
 #' @importFrom stats p.adjust qnorm pnorm median
 #' @importFrom cli cli_alert_info cli_progress_bar cli_progress_update cli_progress_done

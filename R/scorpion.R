@@ -35,7 +35,7 @@
 #'     \item{numTFs: Number of transcription factors}
 #'     \item{numEdges: Total number of edges in regulatory network}
 #'   }
-#' @seealso \code{\link{runSCORPION}} for building networks across cell groups.
+#' @seealso \code{\link{runMANTICORE}} for building networks across cell groups.
 #' @examples
 #' # Loading example data
 #' data(scorpionTest)

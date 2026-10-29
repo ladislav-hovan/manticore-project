@@ -29,7 +29,7 @@
 #'     \item{meanEdge: Overall mean edge weight across all conditions}
 #'     \item{One column per condition showing mean edge weight in that condition}
 #'   }
-#' @seealso \code{\link{runSCORPION}}, \code{\link{testEdges}}
+#' @seealso \code{\link{runMANTICORE}}, \code{\link{testEdges}}
 #' @details
 #' This function performs simple linear regression for each edge, modeling edge weight
 #' as a function of an ordered categorical variable (coded as 0, 1, 2, ... for each

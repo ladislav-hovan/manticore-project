@@ -31,7 +31,7 @@ test_that("scorpion() alphaValue parameter validation - value > 1", {
   )
 })
 
-test_that("runSCORPION() input validation checks gexMatrix dimensions", {
+test_that("runMANTICORE() input validation checks gexMatrix dimensions", {
   data(scorpionTest)
   
   # Create mismatched metadata
@@ -39,7 +39,7 @@ test_that("runSCORPION() input validation checks gexMatrix dimensions", {
   
   # Should error because gexMatrix has more columns than metadata has rows
   expect_error(
-    runSCORPION(
+    runMANTICORE(
       gexMatrix = scorpionTest$gex,
       tfMotifs = scorpionTest$tf,
       ppiNet = scorpionTest$ppi,
@@ -50,12 +50,12 @@ test_that("runSCORPION() input validation checks gexMatrix dimensions", {
   )
 })
 
-test_that("runSCORPION() validates groupBy column existence", {
+test_that("runMANTICORE() validates groupBy column existence", {
   data(scorpionTest)
   
   # Should error with invalid groupBy column
   expect_error(
-    runSCORPION(
+    runMANTICORE(
       gexMatrix = scorpionTest$gex,
       tfMotifs = scorpionTest$tf,
       ppiNet = scorpionTest$ppi,
@@ -66,12 +66,12 @@ test_that("runSCORPION() validates groupBy column existence", {
   )
 })
 
-test_that("runSCORPION() batch effect correction requires batch parameter", {
+test_that("runMANTICORE() batch effect correction requires batch parameter", {
   data(scorpionTest)
   
   # Should error when removeBatchEffect=TRUE but no batch parameter
   expect_error(
-    runSCORPION(
+    runMANTICORE(
       gexMatrix = scorpionTest$gex,
       tfMotifs = scorpionTest$tf,
       ppiNet = scorpionTest$ppi,

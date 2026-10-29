@@ -6,13 +6,13 @@ test_that("scorpion() does NOT have countMatrix parameter", {
   expect_false("countMatrix" %in% names(sig))
 })
 
-test_that("runSCORPION() does NOT have countMatrix parameter", {
-  sig <- formals(runSCORPION)
+test_that("runMANTICORE() does NOT have countMatrix parameter", {
+  sig <- formals(runMANTICORE)
   expect_false("countMatrix" %in% names(sig))
 })
 
-test_that("runSCORPION() does NOT have tfTargets parameter", {
-  sig <- formals(runSCORPION)
+test_that("runMANTICORE() does NOT have tfTargets parameter", {
+  sig <- formals(runMANTICORE)
   expect_false("tfTargets" %in% names(sig))
 })
 
@@ -26,8 +26,8 @@ test_that("Old parameter names do not exist in scorpion()", {
   }
 })
 
-test_that("Old parameter names do not exist in runSCORPION()", {
-  sig <- formals(runSCORPION)
+test_that("Old parameter names do not exist in runMANTICORE()", {
+  sig <- formals(runMANTICORE)
   old_names <- c("countMatrix", "tfTargets", "tfData")
   
   for (name in old_names) {

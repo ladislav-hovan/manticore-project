@@ -1,9 +1,9 @@
-# Tests for data preprocessing and parameter effects in runSCORPION()
+# Tests for data preprocessing and parameter effects in runMANTICORE()
 # Validates normalization, batch correction, and parameter passing
 
-test_that("runSCORPION() parameter passing to scorpion() works with alphaValue", {
+test_that("runMANTICORE() parameter passing to scorpion() works with alphaValue", {
   data(scorpionTest)
-  result_alpha_low <- runSCORPION(
+  result_alpha_low <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -13,7 +13,7 @@ test_that("runSCORPION() parameter passing to scorpion() works with alphaValue",
     showProgress = FALSE
   )
   
-  result_alpha_high <- runSCORPION(
+  result_alpha_high <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -31,9 +31,9 @@ test_that("runSCORPION() parameter passing to scorpion() works with alphaValue",
   expect_equal(nrow(result_alpha_low), nrow(result_alpha_high))
 })
 
-test_that("runSCORPION() data normalization affects results", {
+test_that("runMANTICORE() data normalization affects results", {
   data(scorpionTest)
-  result_normalized <- runSCORPION(
+  result_normalized <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -43,7 +43,7 @@ test_that("runSCORPION() data normalization affects results", {
     showProgress = FALSE
   )
   
-  result_unnormalized <- runSCORPION(
+  result_unnormalized <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -60,10 +60,10 @@ test_that("runSCORPION() data normalization affects results", {
   expect_equal(colnames(result_normalized), colnames(result_unnormalized))
 })
 
-test_that("runSCORPION() batch effect correction works with valid batch", {
+test_that("runMANTICORE() batch effect correction works with valid batch", {
   data(scorpionTest)
   
-  result <- runSCORPION(
+  result <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -78,7 +78,7 @@ test_that("runSCORPION() batch effect correction works with valid batch", {
   expect_true(all(c("tf", "target") %in% colnames(result)))
 })
 
-test_that("runSCORPION() skips batch correction when batch has a single level", {
+test_that("runMANTICORE() skips batch correction when batch has a single level", {
   data(scorpionTest)
 
   args <- list(
@@ -91,10 +91,10 @@ test_that("runSCORPION() skips batch correction when batch has a single level", 
   )
 
   set.seed(1)
-  uncorrected <- do.call(runSCORPION, args)
+  uncorrected <- do.call(runMANTICORE, args)
   set.seed(1)
   expect_message(
-    single_batch <- do.call(runSCORPION, c(args, list(
+    single_batch <- do.call(runMANTICORE, c(args, list(
       removeBatchEffect = TRUE,
       batch = rep("b1", ncol(scorpionTest$gex))
     ))),

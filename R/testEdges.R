@@ -59,7 +59,7 @@
 #'     \item{pAdj: Adjusted p-value}
 #'     \item{For two-sample tests: meanGroup1, meanGroup2, cohensD, log2FoldChange (Group1 - Group2)}
 #'   }
-#' @seealso \code{\link{runSCORPION}}, \code{\link{maEdges}}, \code{\link{circosEdges}}
+#' @seealso \code{\link{runMANTICORE}}, \code{\link{maEdges}}, \code{\link{circosEdges}}
 #' @details
 #' For single-sample tests, the function tests whether the mean edge weight across
 #' replicates significantly differs from zero using a one-sample t-test.

@@ -1,9 +1,9 @@
-# Tests for runSCORPION() network computation
-# Validates that runSCORPION() produces correct output structures and grouping
+# Tests for runMANTICORE() network computation
+# Validates that runMANTICORE() produces correct output structures and grouping
 
-test_that("runSCORPION() accepts gexMatrix and tfMotifs parameters and returns data.frame", {
+test_that("runMANTICORE() accepts gexMatrix and tfMotifs parameters and returns data.frame", {
   data(scorpionTest)
-  result <- runSCORPION(
+  result <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -17,9 +17,9 @@ test_that("runSCORPION() accepts gexMatrix and tfMotifs parameters and returns d
   expect_true(nrow(result) > 0)
 })
 
-test_that("runSCORPION() produces wide-format output with network columns", {
+test_that("runMANTICORE() produces wide-format output with network columns", {
   data(scorpionTest)
-  result <- runSCORPION(
+  result <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -37,10 +37,10 @@ test_that("runSCORPION() produces wide-format output with network columns", {
   expect_true(all(unique_regions %in% network_columns))
 })
 
-# test_that("runSCORPION() handles NULL ppiNet correctly", {
+# test_that("runMANTICORE() handles NULL ppiNet correctly", {
 #   skip("Skipped - implementation does not support NULL ppiNet")
 #   data(scorpionTest)
-#   result <- runSCORPION(
+#   result <- runMANTICORE(
 #     gexMatrix = scorpionTest$gex,
 #     tfMotifs = scorpionTest$tf,
 #     ppiNet = NULL,
@@ -53,11 +53,11 @@ test_that("runSCORPION() produces wide-format output with network columns", {
 #   expect_true(all(c("tf", "target") %in% colnames(result)))
 # })
 
-test_that("runSCORPION() selects correct output network with outNet parameter", {
+test_that("runMANTICORE() selects correct output network with outNet parameter", {
   data(scorpionTest)
 
   # Test with default outNet = "regNet"
-  result_default <- runSCORPION(
+  result_default <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,

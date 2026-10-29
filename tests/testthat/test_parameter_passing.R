@@ -1,7 +1,7 @@
-# Tests for parameter passing between scorpion() and runSCORPION()
+# Tests for parameter passing between scorpion() and runMANTICORE()
 # Validates that parameters are correctly passed from wrapper to core function
 
-test_that("scorpion() and runSCORPION() share compatible parameter defaults", {
+test_that("scorpion() and runMANTICORE() share compatible parameter defaults", {
   data(scorpionTest)
   
   # scorpion() with default parameters
@@ -13,7 +13,7 @@ test_that("scorpion() and runSCORPION() share compatible parameter defaults", {
   )
   
   # Both functions should work with default parameters
-  result_runscoprion <- runSCORPION(
+  result_runscoprion <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -27,10 +27,10 @@ test_that("scorpion() and runSCORPION() share compatible parameter defaults", {
   expect_true(is.data.frame(result_runscoprion))
 })
 
-test_that("runSCORPION() correctly passes computingEngine parameter to scorpion()", {
+test_that("runMANTICORE() correctly passes computingEngine parameter to scorpion()", {
   data(scorpionTest)
   
-  result_cpu <- runSCORPION(
+  result_cpu <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -44,10 +44,10 @@ test_that("runSCORPION() correctly passes computingEngine parameter to scorpion(
   expect_true(all(c("tf", "target") %in% colnames(result_cpu)))
 })
 
-test_that("runSCORPION() correctly passes nPC parameter to scorpion()", {
+test_that("runMANTICORE() correctly passes nPC parameter to scorpion()", {
   data(scorpionTest)
   
-  result <- runSCORPION(
+  result <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -60,10 +60,10 @@ test_that("runSCORPION() correctly passes nPC parameter to scorpion()", {
   expect_true(is.data.frame(result))
 })
 
-test_that("runSCORPION() correctly passes assocMethod parameter to scorpion()", {
+test_that("runMANTICORE() correctly passes assocMethod parameter to scorpion()", {
   data(scorpionTest)
   
-  result <- runSCORPION(
+  result <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,

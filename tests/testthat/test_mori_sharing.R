@@ -1,7 +1,7 @@
-# Tests for optional 'mori' shared-memory acceleration of runSCORPION().
+# Tests for optional 'mori' shared-memory acceleration of runMANTICORE().
 # All tests skip unless mori (and the parallel stack) is installed.
 
-test_that("runSCORPION() with mori matches results without mori", {
+test_that("runMANTICORE() with mori matches results without mori", {
   skip_on_cran()
   skip_if_not_installed("mori")
   skip_if_not_installed("furrr")
@@ -18,7 +18,7 @@ test_that("runSCORPION() with mori matches results without mori", {
 
   run <- function() {
     set.seed(1)
-    runSCORPION(
+    runMANTICORE(
       gexMatrix = scorpionTest$gex,
       tfMotifs = scorpionTest$tf,
       ppiNet = scorpionTest$ppi,
@@ -65,7 +65,7 @@ test_that("mori::share() emits a compact serialized reference", {
   expect_lt(size_shared, 10000)  # a few bytes / KB, not the full payload
 })
 
-test_that("runSCORPION() parallel performance with vs without mori", {
+test_that("runMANTICORE() parallel performance with vs without mori", {
   skip_on_cran()
   skip_if_not_installed("mori")
   skip_if_not_installed("furrr")
@@ -80,7 +80,7 @@ test_that("runSCORPION() parallel performance with vs without mori", {
   on.exit(options(scorpion.use_mori = old_opt), add = TRUE)
 
   run <- function() {
-    runSCORPION(
+    runMANTICORE(
       gexMatrix = scorpionTest$gex,
       tfMotifs = scorpionTest$tf,
       ppiNet = scorpionTest$ppi,
@@ -102,7 +102,7 @@ test_that("runSCORPION() parallel performance with vs without mori", {
   t_mori <- system.time(run())[["elapsed"]]
 
   message(sprintf(
-    "runSCORPION parallel timing: without mori = %.2fs, with mori = %.2fs (%.2fx)",
+    "runMANTICORE parallel timing: without mori = %.2fs, with mori = %.2fs (%.2fx)",
     t_plain, t_mori, t_plain / t_mori
   ))
 

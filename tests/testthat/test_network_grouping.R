@@ -1,9 +1,9 @@
-# Tests for cell grouping functionality in runSCORPION()
+# Tests for cell grouping functionality in runMANTICORE()
 # Validates that cells are grouped correctly and networks are created per group
 
-test_that("runSCORPION() groups cells correctly for single groupBy column", {
+test_that("runMANTICORE() groups cells correctly for single groupBy column", {
   data(scorpionTest)
-  result <- runSCORPION(
+  result <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -19,9 +19,9 @@ test_that("runSCORPION() groups cells correctly for single groupBy column", {
   expect_true(all(expected_networks %in% network_columns))
 })
 
-test_that("runSCORPION() groups cells correctly for multiple groupBy columns", {
+test_that("runMANTICORE() groups cells correctly for multiple groupBy columns", {
   data(scorpionTest)
-  result <- runSCORPION(
+  result <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
@@ -37,11 +37,11 @@ test_that("runSCORPION() groups cells correctly for multiple groupBy columns", {
   expect_true(all(grepl("--", network_columns)))  # Multiple groupBy uses -- separator
 })
 
-test_that("runSCORPION() respects minCells parameter for filtering", {
+test_that("runMANTICORE() respects minCells parameter for filtering", {
   data(scorpionTest)
   
   # With minCells = 1, all groups should be included
-  result_min_1 <- runSCORPION(
+  result_min_1 <- runMANTICORE(
     gexMatrix = scorpionTest$gex,
     tfMotifs = scorpionTest$tf,
     ppiNet = scorpionTest$ppi,
