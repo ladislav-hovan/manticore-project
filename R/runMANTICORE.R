@@ -243,7 +243,7 @@ runMANTICORE <- function(
   }
 
   if (showProgress) {
-    cli::cli_h1("SCORPION")
+    cli::cli_h1("MANTICORE")
   }
 
   # Control BLAS threading to respect nCores
@@ -303,6 +303,8 @@ runMANTICORE <- function(
   rm(cellsMetadata)
 
   total_net <- length(unique(metadata$network_id))
+  # TODO: Minimum number of cells has to be enforced on the level of all
+  # subgroups combined, plus every subgroup would need at least 10
   metadata <- metadata %>% filter(.data$n_cells >= min_cells)
   filtered_net <- length(unique(metadata$network_id))
 
@@ -320,14 +322,29 @@ runMANTICORE <- function(
   # Pre-split gexMatrix into per-group chunks so each worker only receives
   # the subset it needs, instead of the full matrix. Cells are grouped in a
   # single pass with split() rather than rescanning metadata per network.
+  # TODO: Remove these later
   cells_by_network <- split(metadata$cell_id, metadata$network_id)
   gex_chunks <- lapply(network_ids, function(nid) {
     gexMatrix[, cells_by_network[[nid]], drop = FALSE]
   })
-  rm(gexMatrix, metadata, cells_by_network)
+  # rm(gexMatrix, metadata, cells_by_network)
 
+  # Group the supercells here but keep everything together
+  gexList = list()
+  for (nid in network_ids) {
+    gexChunk <- gexMatrix[, cells_by_network[[nid]], drop = FALSE]
+    gexSC <- makeSuperCells(X = gexChunk, gamma = gammaValue, n.pc = nPC, fast.pca = FALSE)
+    n_cols <- ncol(gexSC)
+    colnames(gexSC) <- paste0(nid, "_", seq_len(n_cols))
+    gexList[[nid]] <- gexSC
+  }
+  gexAdjusted <- do.call(cbind, gexList)
+  rm(gexMatrix, metadata, gexList, gexChunk, gexSC, cells_by_network)
+
+
+  # TODO: This will be changed to do LIONESS-like chunks
   compute_network <- function(gex_chunk) {
-    network <- scorpion(
+    network <- manticore(
       gexMatrix = gex_chunk,
       tfMotifs = tfMotifs,
       ppiNet = ppiNet,
