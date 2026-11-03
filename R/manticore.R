@@ -9,12 +9,10 @@
 #' expression data into unified regulatory networks.
 #' @author Daniel Osorio <daniecos@uio.no>
 #' @param tfMotifs A motif dataset (data.frame or matrix) with 3 columns: TF, target gene, and motif score. Pass NULL for co-expression analysis only.
-#' @param gexMatrix An expression dataset, with genes in the rows and barcodes (cells) in the columns.
+#' @param gexAdjusted An expression dataset, with genes in the rows and barcodes (cells) in the columns.
 #' @param ppiNet A Protein-Protein-Interaction dataset (data.frame or matrix) with 3 columns: protein 1, protein 2, and interaction score. Pass NULL to disable protein interaction integration.
 #' @param computingEngine Character specifying computing device: 'cpu' or 'gpu' (if available). Default 'cpu'.
 #' @param nCores Number of processors to be used if BLAS or MPI is active.
-#' @param gammaValue Graining level of data (proportion of number of single cells in the initial dataset to the number of super-cells in the final dataset)
-#' @param nPC Number of principal components to use for construction of single-cell kNN network.
 #' @param alphaValue Numeric update parameter (0 to 1) controlling relative contribution of prior networks. Default 0.1.
 #' @param hammingValue Numeric convergence threshold based on Hamming distance. Algorithm stops when updates fall below this. Default 0.001.
 #' @param assocMethod Association method. Must be one of 'pearson', 'spearman' or 'pcNet'.
@@ -75,7 +73,7 @@
 #' # We are using alphaValue = 0.8 for testing purposes (Default = 0.1).
 #' manticoreOutput <- manticore(
 #'   tfMotifs = manticoreTest$tf,
-#'   gexMatrix = manticoreTest$gex[, manticoreTest$metadata$region == "N"],
+#'   gexAdjusted = manticoreTest$gex[, manticoreTest$metadata$region == "N"],
 #'   ppiNet = manticoreTest$ppi,
 #'   alphaValue = 0.8
 #' )
@@ -109,12 +107,12 @@
 #' # $ numEdges: int 270603
 manticore <- function(
   tfMotifs = NULL,
-  gexMatrix,
+  gexAdjusted,
   ppiNet = NULL,
+  pandaNet,
+  sample,
   computingEngine = "cpu",
   nCores = 1,
-  gammaValue = 10,
-  nPC = 25,
   assocMethod = "pearson",
   alphaValue = 0.1,
   hammingValue = 0.001,
@@ -123,8 +121,7 @@ manticore <- function(
   zScaling = TRUE,
   showProgress = TRUE,
   randomizationMethod = "None",
-  scaleByPresent = FALSE,
-  filterExpr = FALSE
+  scaleByPresent = FALSE
 ) {
   # Input validation
   if (!is.numeric(alphaValue) || alphaValue < 0 || alphaValue > 1) {
@@ -139,12 +136,6 @@ manticore <- function(
   if (!computingEngine %in% c("cpu", "gpu")) {
     cli::cli_abort("computingEngine must be either 'cpu' or 'gpu'")
   }
-  if (ncol(gexMatrix) < 30) {
-    cli::cli_warn("gexMatrix has fewer than 30 cells. Network inference may be unreliable.")
-  }
-  if (nrow(gexMatrix) < 10) {
-    cli::cli_abort("gexMatrix must have at least 10 genes (rows)")
-  }
 
   if (showProgress) {
     cli::cli_h1("MANTICORE")
@@ -157,33 +148,21 @@ manticore <- function(
     on.exit(RhpcBLASctl::blas_set_num_threads(old_blas), add = TRUE)
   }
 
-  if (isTRUE(filterExpr)) {
-    gexMatrix <- gexMatrix[rowSums(gexMatrix) > 0, ]
-  }
-  # TODO: Matrix was kept together, but we need to cluster each subset
-  # separately, so some kind of for loop will be required, but no adjustments
-  # to the makeSuperCells function, probably
-  gexMatrix <- makeSuperCells(X = gexMatrix, gamma = gammaValue, n.pc = nPC, fast.pca = FALSE)
-
-  # TODO: If the control of parallelisation remains at the runMANTICORE level,
-  # then the whole thing should be reconfigured to make sure LIONESS
-  # calculations are parallelised, not necessarily different cell types
-
   if (is.null(ppiNet) & is.null(tfMotifs)) {
     # Densify once; centering already destroys sparsity, so keep a single dense
     # base copy and use BLAS tcrossprod (dsyrk) for the co-expression matrix.
-    gexMatrix <- as.matrix(gexMatrix)
+    gexAdjusted <- as.matrix(gexAdjusted)
     if (assocMethod == "spearman") {
-      gexMatrix <- t(apply(gexMatrix, 1, rank))
+      gexAdjusted <- t(apply(gexAdjusted, 1, rank))
     }
-    geneCoExpr <- gexMatrix - rowMeans(gexMatrix)
+    geneCoExpr <- gexAdjusted - rowMeans(gexAdjusted)
     geneCoExpr <- geneCoExpr / sqrt(rowSums(geneCoExpr^2))
     return(tcrossprod(geneCoExpr))
   }
   outNetworks <- runPANDA(
     motif = tfMotifs,
     ppi = ppiNet,
-    expr = gexMatrix,
+    expr = gexAdjusted[, colnames(gexAdjusted) != sample, drop = FALSE],
     computing.engine = computingEngine,
     n.cores = nCores,
     alpha = alphaValue,
@@ -196,5 +175,10 @@ manticore <- function(
     assoc.method = assocMethod,
     scale.by.present = scaleByPresent
   )
+  print(dim(outNetworks$regNet))
+  print(dim(outNetworks$coregNet))
+  print(dim(outNetworks$coopNet))
+  # Apply the LIONESS equation to compute single-sample networks
+
   return(outNetworks)
 }

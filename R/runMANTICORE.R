@@ -288,6 +288,7 @@ runMANTICORE <- function(
 
   # Setting min number of cells to construct network
   min_cells <- max(minCells, 30)
+  min_cells_per_group <- 10
 
   if (all(groupBy %in% colnames(cellsMetadata))) {
     # Vectorized row-wise concatenation of the grouping columns; avoids the
@@ -318,16 +319,7 @@ runMANTICORE <- function(
   }
 
   network_ids <- unique(metadata$network_id)
-
-  # Pre-split gexMatrix into per-group chunks so each worker only receives
-  # the subset it needs, instead of the full matrix. Cells are grouped in a
-  # single pass with split() rather than rescanning metadata per network.
-  # TODO: Remove these later
   cells_by_network <- split(metadata$cell_id, metadata$network_id)
-  gex_chunks <- lapply(network_ids, function(nid) {
-    gexMatrix[, cells_by_network[[nid]], drop = FALSE]
-  })
-  # rm(gexMatrix, metadata, cells_by_network)
 
   # Group the supercells here but keep everything together
   gexList = list()
@@ -341,17 +333,33 @@ runMANTICORE <- function(
   gexAdjusted <- do.call(cbind, gexList)
   rm(gexMatrix, metadata, gexList, gexChunk, gexSC, cells_by_network)
 
+  pandaNet <- runPANDA(
+    motif = tfMotifs,
+    ppi = ppiNet,
+    expr = gexAdjusted,
+    computing.engine = computingEngine,
+    n.cores = nCores,
+    alpha = alphaValue,
+    hamming = hammingValue,
+    iter = nIter,
+    output = outNet,
+    zScale = zScaling,
+    progress = showProgress,
+    randomize = randomizationMethod,
+    assoc.method = assocMethod,
+    scale.by.present = scaleByPresent
+  )
 
-  # TODO: This will be changed to do LIONESS-like chunks
-  compute_network <- function(gex_chunk) {
+  # Applies LIONESS to an expression chunk with a single missing column
+  compute_network <- function(sample) {
     network <- manticore(
-      gexMatrix = gex_chunk,
+      gexAdjusted = gexAdjusted,
       tfMotifs = tfMotifs,
       ppiNet = ppiNet,
+      pandaNet = pandaNet,
+      sample = sample,
       computingEngine = computingEngine,
       nCores = 1,
-      gammaValue = gammaValue,
-      nPC = nPC,
       assocMethod = assocMethod,
       alphaValue = alphaValue,
       hammingValue = hammingValue,
@@ -360,8 +368,7 @@ runMANTICORE <- function(
       zScaling = zScaling,
       showProgress = FALSE,
       randomizationMethod = randomizationMethod,
-      scaleByPresent = scaleByPresent,
-      filterExpr = filterExpr
+      scaleByPresent = scaleByPresent
     )
 
     # Return a single matrix when one network is requested, otherwise a
@@ -383,6 +390,8 @@ runMANTICORE <- function(
   if (use_mori) {
     if (!is.null(tfMotifs)) tfMotifs <- mori::share(tfMotifs)
     if (!is.null(ppiNet)) ppiNet <- mori::share(ppiNet)
+    gexAdjusted <- mori::share(gexAdjusted)
+    pandaNet <- mori::share(pandaNet)
   }
 
   furrr_opts <- furrr::furrr_options(
@@ -402,25 +411,25 @@ runMANTICORE <- function(
     on.exit(future::plan(old_plan), add = TRUE)
   }
 
-  n_total <- length(gex_chunks)
+  n_total <- ncol(gexAdjusted)
+  col_names <- colnames(gexAdjusted)
 
   if (showProgress) {
     cli::cli_alert_info(paste0("Computing ", n_total, " networks"))
     if (nCores > 1) {
       cli::cli_alert_info(paste0("Using ", nCores, " cores for parallel processing"))
-      network_matrices <- furrr::future_map(gex_chunks, compute_network, .options = furrr_opts, .progress = FALSE)
+      network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
     } else {
       network_matrices <- vector("list", n_total)
       for (i in seq_len(n_total)) {
-        cli::cli_alert_info(paste0("Network ", i, "/", n_total, ": ", network_ids[i]))
-        network_matrices[[i]] <- compute_network(gex_chunks[[i]])
+        cli::cli_alert_info(paste0("Network ", i, "/", n_total, ": ", col_names[i]))
+        network_matrices[[i]] <- compute_network(col_names[i])
       }
     }
     cli::cli_alert_success("Networks successfully constructed")
   } else {
-    network_matrices <- furrr::future_map(gex_chunks, compute_network, .options = furrr_opts, .progress = FALSE)
+    network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
   }
-  rm(gex_chunks)
 
   n_nets <- length(network_matrices)
 
