@@ -3,13 +3,19 @@ authors = ["Ladislav Hovan <19410951+ladislav-hovan@users.noreply.github.com>"]
 channels = ["conda-forge"]
 name = "manticore-project"
 platforms = ["linux-64"]
+preview = ["pixi-build"]
 version = "0.1.0"
+
+[package.build.backend]
+name = "pixi-build-r"
+version = "*"
 
 [tasks]
 
 [dependencies]
-r-base = "4.5.*"
-r-devtools = ">=2.5.2,<3"
+r-base = "4.4.*"
+r-cli = ">=3.6.6,<4"
+r-devtools = ">=2.4.0,<3"
 r-dplyr = ">=1.2.1,<2"
 r-furrr = ">=0.4.0,<0.5"
 r-future = ">=1.80.0,<2"

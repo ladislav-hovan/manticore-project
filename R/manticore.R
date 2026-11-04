@@ -175,9 +175,6 @@ manticore <- function(
     assoc.method = assocMethod,
     scale.by.present = scaleByPresent
   )
-  print(dim(outNetworks$regNet))
-  print(dim(outNetworks$coregNet))
-  print(dim(outNetworks$coopNet))
   # Apply the LIONESS equation to compute single-sample networks
 
   return(outNetworks)

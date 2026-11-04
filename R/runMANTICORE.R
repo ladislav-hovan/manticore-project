@@ -333,6 +333,10 @@ runMANTICORE <- function(
   gexAdjusted <- do.call(cbind, gexList)
   rm(gexMatrix, metadata, gexList, gexChunk, gexSC, cells_by_network)
 
+  # Reduce size for testing
+  # TODO: Get rid of this when testing is done
+  gexAdjusted <- gexAdjusted[, 1:10]
+
   pandaNet <- runPANDA(
     motif = tfMotifs,
     ppi = ppiNet,
@@ -427,6 +431,7 @@ runMANTICORE <- function(
       }
     }
     cli::cli_alert_success("Networks successfully constructed")
+    # TODO: Report on total time spent
   } else {
     network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
   }
@@ -450,12 +455,11 @@ runMANTICORE <- function(
       stringsAsFactors = FALSE
     )
     n_edges <- n_tf * n_target
-
     # Stream extraction: place each network's weights into their global
     # tf/target positions, then NULL out the list element immediately to
     # free memory.
     weight_matrix <- matrix(NA_real_, nrow = n_edges, ncol = n_nets)
-    colnames(weight_matrix) <- network_ids
+    colnames(weight_matrix) <- col_names
     for (k in seq_len(n_nets)) {
       net_k <- as.matrix(network_matrices[[k]])
       row_idx <- match(rownames(net_k), all_tfs)
@@ -465,7 +469,6 @@ runMANTICORE <- function(
       network_matrices[k] <- list(NULL)
     }
     rm(network_matrices)
-
     # Combine into final data frame
     networks <- data.frame(
       tf = as.character(tf_target_df$tf),
