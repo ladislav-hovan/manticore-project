@@ -8,9 +8,10 @@ version = "0.1.0"
 
 [package.build.backend]
 name = "pixi-build-r"
-version = "*"
+channel = "conda-forge"
 
 [tasks]
+install-local = "R CMD INSTALL ./"
 
 [dependencies]
 r-base = "4.4.*"

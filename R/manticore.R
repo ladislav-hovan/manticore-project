@@ -175,7 +175,13 @@ manticore <- function(
     assoc.method = assocMethod,
     scale.by.present = scaleByPresent
   )
-  # Apply the LIONESS equation to compute single-sample networks
+  # Apply the LIONESS equation to compute single-sample network
+  for (netName in names(outNetworks)) {
+    if (is.matrix(outNetworks[[netName]])) {
+      outNetworks[[netName]] <- outNetworks[[netName]] + (
+        ncol(gexAdjusted) * (pandaNet[[netName]] - outNetworks[[netName]]))
+    }
+  }
 
   return(outNetworks)
 }

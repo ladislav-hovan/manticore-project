@@ -420,6 +420,7 @@ runMANTICORE <- function(
 
   if (showProgress) {
     cli::cli_alert_info(paste0("Computing ", n_total, " networks"))
+    tic <- proc.time()[3]
     if (nCores > 1) {
       cli::cli_alert_info(paste0("Using ", nCores, " cores for parallel processing"))
       network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
@@ -431,7 +432,8 @@ runMANTICORE <- function(
       }
     }
     cli::cli_alert_success("Networks successfully constructed")
-    # TODO: Report on total time spent
+    toc <- proc.time()[3]
+    cli::cli_alert_info(paste0("Total time elapsed: ", round(toc - tic, 2), " seconds"))
   } else {
     network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
   }

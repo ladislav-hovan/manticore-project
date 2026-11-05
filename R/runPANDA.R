@@ -192,7 +192,7 @@ runPANDA <- function(
   geneCoreg <- normalizeNetwork(geneCoreg)
 
   if (progress) {
-    cli::cli_alert_info("Learning Network")
+    cli::cli_alert_info("Learning network")
   }
 
   if (computing.engine == "gpu") {
