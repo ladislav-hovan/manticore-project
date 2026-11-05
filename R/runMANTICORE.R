@@ -189,7 +189,7 @@
 #' # 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.3274770 -0.34475499 -0.12449908
 #' }
 #' @export
-#' @importFrom dplyr %>% mutate group_by filter .data
+#' @importFrom dplyr %>% mutate group_by filter .data pull summarize
 #' @importFrom cli cli_h1 cli_alert_success cli_alert_info cli_abort cli_progress_along
 #' @importFrom furrr future_map furrr_options
 #' @importFrom future plan multisession sequential
@@ -287,8 +287,8 @@ runMANTICORE <- function(
   ppiNet <- as.data.frame(ppiNet)
 
   # Setting min number of cells to construct network
-  min_cells <- max(minCells, 30)
-  min_cells_per_group <- 10
+  min_cells <- max(minCells, 3 * gammaValue)  # Ensure at least 3 super-cells
+  min_cells_per_group <- gammaValue
 
   if (all(groupBy %in% colnames(cellsMetadata))) {
     # Vectorized row-wise concatenation of the grouping columns; avoids the
@@ -304,18 +304,19 @@ runMANTICORE <- function(
   rm(cellsMetadata)
 
   total_net <- length(unique(metadata$network_id))
-  # TODO: Minimum number of cells has to be enforced on the level of all
-  # subgroups combined, plus every subgroup would need at least 10
-  metadata <- metadata %>% filter(.data$n_cells >= min_cells)
+  # Every subgroup needs at least 10 (by default) cells
+  metadata <- metadata %>% filter(.data$n_cells >= min_cells_per_group)
   filtered_net <- length(unique(metadata$network_id))
 
   if (showProgress) {
-    cli::cli_alert_info(paste0(total_net, " networks requested"))
-    cli::cli_alert_success(paste0(filtered_net, " networks meet the minimum cell requirement (", min_cells, ")"))
+    cli::cli_alert_info(paste0(total_net, " groups requested"))
+    cli::cli_alert_success(paste0(filtered_net, " groups meet the minimum cell requirement (", min_cells_per_group, ")"))
   }
 
-  if (filtered_net == 0) {
-    cli::cli_abort("No groups have enough cells (>= {min_cells}) to build a network")
+  # Check if there are enough total cells remaining after filtering to build reliable networks (by default 30)
+  n_total_cells <- sum(metadata %>% group_by(.data$network_id) %>% summarize(mean_n_cells = mean(.data$n_cells)) %>% pull(.data$mean_n_cells))
+  if (n_total_cells < min_cells) {
+    cli::cli_abort(paste0("There are not enough total cells (< ", min_cells, ") to build reliable networks."))
   }
 
   network_ids <- unique(metadata$network_id)
@@ -333,10 +334,9 @@ runMANTICORE <- function(
   gexAdjusted <- do.call(cbind, gexList)
   rm(gexMatrix, metadata, gexList, gexChunk, gexSC, cells_by_network)
 
-  # Reduce size for testing
-  # TODO: Get rid of this when testing is done
-  gexAdjusted <- gexAdjusted[, 1:10]
-
+  if (showProgress) {
+    cli::cli_alert_info(paste0("Computing the background PANDA network"))
+  }
   pandaNet <- runPANDA(
     motif = tfMotifs,
     ppi = ppiNet,
