@@ -11,6 +11,8 @@
 #' @param tfMotifs A motif dataset (data.frame or matrix) with 3 columns: TF, target gene, and motif score. Pass NULL for co-expression analysis only.
 #' @param gexAdjusted An expression dataset, with genes in the rows and barcodes (cells) in the columns.
 #' @param ppiNet A Protein-Protein-Interaction dataset (data.frame or matrix) with 3 columns: protein 1, protein 2, and interaction score. Pass NULL to disable protein interaction integration.
+#' @param pandaNet A list of networks inferred by PANDA on the full dataset (before single-sample inference).
+#' @param sample The name of the sample (cell barcode) for which to infer a single-sample network.
 #' @param computingEngine Character specifying computing device: 'cpu' or 'gpu' (if available). Default 'cpu'.
 #' @param nCores Number of processors to be used if BLAS or MPI is active.
 #' @param alphaValue Numeric update parameter (0 to 1) controlling relative contribution of prior networks. Default 0.1.

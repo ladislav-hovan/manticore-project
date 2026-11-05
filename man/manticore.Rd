@@ -30,6 +30,10 @@ manticore(
 
 \item{ppiNet}{A Protein-Protein-Interaction dataset (data.frame or matrix) with 3 columns: protein 1, protein 2, and interaction score. Pass NULL to disable protein interaction integration.}
 
+\item{pandaNet}{A list of networks inferred by PANDA on the full dataset (before single-sample inference).}
+
+\item{sample}{The name of the sample (cell barcode) for which to infer a single-sample network.}
+
 \item{computingEngine}{Character specifying computing device: 'cpu' or 'gpu' (if available). Default 'cpu'.}
 
 \item{nCores}{Number of processors to be used if BLAS or MPI is active.}
@@ -73,10 +77,10 @@ expression data into unified regulatory networks.
 }
 \examples{
 # Loading example data
-data(scorpionTest)
+data(manticoreTest)
 
 # The structure of the data
-str(scorpionTest)
+str(manticoreTest)
 
 # List of 4
 # $ gex     :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
