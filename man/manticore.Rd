@@ -50,9 +50,7 @@ manticore(
 
 \item{randomizationMethod}{Method by which to randomize gene expression matrix. Default "None". Must be one of "None", "within.gene", "by.genes". "within.gene" randomization scrambles each row of the gene expression matrix, "by.gene" scrambles gene labels.}
 
-\item{scaleByPresent}{Boolean to indicate scaling of correlations by percentage of positive samples.}
-
-\item{filterExpr}{Boolean to remove genes with zero expression across all cells
+\item{scaleByPresent}{Boolean to indicate scaling of correlations by percentage of positive samples.
 before network inference. Default FALSE.}
 }
 \value{

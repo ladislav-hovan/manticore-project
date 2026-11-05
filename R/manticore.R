@@ -22,7 +22,6 @@
 #' @param showProgress Boolean to indicate printing of output for algorithm progress.
 #' @param randomizationMethod Method by which to randomize gene expression matrix. Default "None". Must be one of "None", "within.gene", "by.genes". "within.gene" randomization scrambles each row of the gene expression matrix, "by.gene" scrambles gene labels.
 #' @param scaleByPresent Boolean to indicate scaling of correlations by percentage of positive samples.
-#' @param filterExpr Boolean to remove genes with zero expression across all cells
 #'   before network inference. Default FALSE.
 #' @return A list of 6 elements describing the inferred networks at convergence:
 #'   \itemize{
@@ -36,10 +35,10 @@
 #' @seealso \code{\link{runMANTICORE}} for building networks across cell groups.
 #' @examples
 #' # Loading example data
-#' data(scorpionTest)
+#' data(manticoreTest)
 #'
 #' # The structure of the data
-#' str(scorpionTest)
+#' str(manticoreTest)
 #'
 #' # List of 4
 #' # $ gex     :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
