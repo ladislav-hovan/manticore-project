@@ -88,7 +88,7 @@ makeSuperCells <- function(
 
   if (do.approx & ((N.c / gamma) > (approx.N / 3))) {
     warning(
-      "N.approx is not much larger than desired number of super-cells, so an approximate simplification may take londer than an exact one!"
+      "N.approx is not much larger than desired number of super-cells, so an approximate simplification may take longer than an exact one!"
     )
   }
 
@@ -171,7 +171,7 @@ makeSuperCells <- function(
       paste(
         "Unknown clustering method (",
         igraph.clustering,
-        "), please use louvain or walkrtap"
+        "), please use louvain or walktrap"
       )
     )
   }

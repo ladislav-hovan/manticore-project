@@ -189,7 +189,7 @@
 #' # 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.3274770 -0.34475499 -0.12449908
 #' }
 #' @export
-#' @importFrom dplyr %>% mutate group_by filter .data
+#' @importFrom dplyr %>% mutate group_by filter .data pull summarize
 #' @importFrom cli cli_h1 cli_alert_success cli_alert_info cli_abort cli_progress_along
 #' @importFrom furrr future_map furrr_options
 #' @importFrom future plan multisession sequential
@@ -243,7 +243,7 @@ runMANTICORE <- function(
   }
 
   if (showProgress) {
-    cli::cli_h1("SCORPION")
+    cli::cli_h1("MANTICORE")
   }
 
   # Control BLAS threading to respect nCores
@@ -287,7 +287,8 @@ runMANTICORE <- function(
   ppiNet <- as.data.frame(ppiNet)
 
   # Setting min number of cells to construct network
-  min_cells <- max(minCells, 30)
+  min_cells <- max(minCells, 3 * gammaValue)  # Ensure at least 3 super-cells
+  min_cells_per_group <- gammaValue
 
   if (all(groupBy %in% colnames(cellsMetadata))) {
     # Vectorized row-wise concatenation of the grouping columns; avoids the
@@ -303,38 +304,66 @@ runMANTICORE <- function(
   rm(cellsMetadata)
 
   total_net <- length(unique(metadata$network_id))
-  metadata <- metadata %>% filter(.data$n_cells >= min_cells)
+  # Every subgroup needs at least 10 (by default) cells
+  metadata <- metadata %>% filter(.data$n_cells >= min_cells_per_group)
   filtered_net <- length(unique(metadata$network_id))
 
   if (showProgress) {
-    cli::cli_alert_info(paste0(total_net, " networks requested"))
-    cli::cli_alert_success(paste0(filtered_net, " networks meet the minimum cell requirement (", min_cells, ")"))
+    cli::cli_alert_info(paste0(total_net, " groups requested"))
+    cli::cli_alert_success(paste0(filtered_net, " groups meet the minimum cell requirement (", min_cells_per_group, ")"))
   }
 
-  if (filtered_net == 0) {
-    cli::cli_abort("No groups have enough cells (>= {min_cells}) to build a network")
+  # Check if there are enough total cells remaining after filtering to build reliable networks (by default 30)
+  n_total_cells <- sum(metadata %>% group_by(.data$network_id) %>% summarize(mean_n_cells = mean(.data$n_cells)) %>% pull(.data$mean_n_cells))
+  if (n_total_cells < min_cells) {
+    cli::cli_abort(paste0("There are not enough total cells (< ", min_cells, ") to build reliable networks."))
   }
 
   network_ids <- unique(metadata$network_id)
-
-  # Pre-split gexMatrix into per-group chunks so each worker only receives
-  # the subset it needs, instead of the full matrix. Cells are grouped in a
-  # single pass with split() rather than rescanning metadata per network.
   cells_by_network <- split(metadata$cell_id, metadata$network_id)
-  gex_chunks <- lapply(network_ids, function(nid) {
-    gexMatrix[, cells_by_network[[nid]], drop = FALSE]
-  })
-  rm(gexMatrix, metadata, cells_by_network)
 
-  compute_network <- function(gex_chunk) {
-    network <- scorpion(
-      gexMatrix = gex_chunk,
+  # Group the supercells here but keep everything together
+  gexList = list()
+  for (nid in network_ids) {
+    gexChunk <- gexMatrix[, cells_by_network[[nid]], drop = FALSE]
+    gexSC <- makeSuperCells(X = gexChunk, gamma = gammaValue, n.pc = nPC, fast.pca = FALSE)
+    n_cols <- ncol(gexSC)
+    colnames(gexSC) <- paste0(nid, "_", seq_len(n_cols))
+    gexList[[nid]] <- gexSC
+  }
+  gexAdjusted <- do.call(cbind, gexList)
+  rm(gexMatrix, metadata, gexList, gexChunk, gexSC, cells_by_network)
+
+  if (showProgress) {
+    cli::cli_alert_info(paste0("Computing the background PANDA network"))
+  }
+  pandaNet <- runPANDA(
+    motif = tfMotifs,
+    ppi = ppiNet,
+    expr = gexAdjusted,
+    computing.engine = computingEngine,
+    n.cores = nCores,
+    alpha = alphaValue,
+    hamming = hammingValue,
+    iter = nIter,
+    output = outNet,
+    zScale = zScaling,
+    progress = showProgress,
+    randomize = randomizationMethod,
+    assoc.method = assocMethod,
+    scale.by.present = scaleByPresent
+  )
+
+  # Applies LIONESS to an expression chunk with a single missing column
+  compute_network <- function(sample) {
+    network <- manticore(
+      gexAdjusted = gexAdjusted,
       tfMotifs = tfMotifs,
       ppiNet = ppiNet,
+      pandaNet = pandaNet,
+      sample = sample,
       computingEngine = computingEngine,
       nCores = 1,
-      gammaValue = gammaValue,
-      nPC = nPC,
       assocMethod = assocMethod,
       alphaValue = alphaValue,
       hammingValue = hammingValue,
@@ -343,8 +372,7 @@ runMANTICORE <- function(
       zScaling = zScaling,
       showProgress = FALSE,
       randomizationMethod = randomizationMethod,
-      scaleByPresent = scaleByPresent,
-      filterExpr = filterExpr
+      scaleByPresent = scaleByPresent
     )
 
     # Return a single matrix when one network is requested, otherwise a
@@ -366,6 +394,8 @@ runMANTICORE <- function(
   if (use_mori) {
     if (!is.null(tfMotifs)) tfMotifs <- mori::share(tfMotifs)
     if (!is.null(ppiNet)) ppiNet <- mori::share(ppiNet)
+    gexAdjusted <- mori::share(gexAdjusted)
+    pandaNet <- mori::share(pandaNet)
   }
 
   furrr_opts <- furrr::furrr_options(
@@ -385,25 +415,28 @@ runMANTICORE <- function(
     on.exit(future::plan(old_plan), add = TRUE)
   }
 
-  n_total <- length(gex_chunks)
+  n_total <- ncol(gexAdjusted)
+  col_names <- colnames(gexAdjusted)
 
   if (showProgress) {
     cli::cli_alert_info(paste0("Computing ", n_total, " networks"))
+    tic <- proc.time()[3]
     if (nCores > 1) {
       cli::cli_alert_info(paste0("Using ", nCores, " cores for parallel processing"))
-      network_matrices <- furrr::future_map(gex_chunks, compute_network, .options = furrr_opts, .progress = FALSE)
+      network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
     } else {
       network_matrices <- vector("list", n_total)
       for (i in seq_len(n_total)) {
-        cli::cli_alert_info(paste0("Network ", i, "/", n_total, ": ", network_ids[i]))
-        network_matrices[[i]] <- compute_network(gex_chunks[[i]])
+        cli::cli_alert_info(paste0("Network ", i, "/", n_total, ": ", col_names[i]))
+        network_matrices[[i]] <- compute_network(col_names[i])
       }
     }
     cli::cli_alert_success("Networks successfully constructed")
+    toc <- proc.time()[3]
+    cli::cli_alert_info(paste0("Total time elapsed: ", round(toc - tic, 2), " seconds"))
   } else {
-    network_matrices <- furrr::future_map(gex_chunks, compute_network, .options = furrr_opts, .progress = FALSE)
+    network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
   }
-  rm(gex_chunks)
 
   n_nets <- length(network_matrices)
 
@@ -424,12 +457,11 @@ runMANTICORE <- function(
       stringsAsFactors = FALSE
     )
     n_edges <- n_tf * n_target
-
     # Stream extraction: place each network's weights into their global
     # tf/target positions, then NULL out the list element immediately to
     # free memory.
     weight_matrix <- matrix(NA_real_, nrow = n_edges, ncol = n_nets)
-    colnames(weight_matrix) <- network_ids
+    colnames(weight_matrix) <- col_names
     for (k in seq_len(n_nets)) {
       net_k <- as.matrix(network_matrices[[k]])
       row_idx <- match(rownames(net_k), all_tfs)
@@ -439,7 +471,6 @@ runMANTICORE <- function(
       network_matrices[k] <- list(NULL)
     }
     rm(network_matrices)
-
     # Combine into final data frame
     networks <- data.frame(
       tf = as.character(tf_target_df$tf),

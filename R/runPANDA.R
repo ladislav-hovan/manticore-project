@@ -192,7 +192,7 @@ runPANDA <- function(
   geneCoreg <- normalizeNetwork(geneCoreg)
 
   if (progress) {
-    cli::cli_alert_info("Learning Network")
+    cli::cli_alert_info("Learning network")
   }
 
   if (computing.engine == "gpu") {
@@ -265,7 +265,7 @@ runPANDA <- function(
 
   toc <- proc.time()[3] - tic
   if (progress) {
-    cli::cli_alert_success(paste0("Successfully ran SCORPION on ", num.genes, " Genes and ", num.TFs, " TFs"))
+    cli::cli_alert_success(paste0("Successfully ran PANDA on ", num.genes, " Genes and ", num.TFs, " TFs"))
     cli::cli_alert_info(paste0("Time elapsed: ", round(toc, 2), " seconds"))
     cli::cli_end()
   }
