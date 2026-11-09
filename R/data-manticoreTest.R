@@ -1,13 +1,13 @@
-#' @name scorpionTest
+#' @name manticoreTest
 #' @docType data
-#' @title Example single-cell colorectal cancer data for SCORPION
+#' @title Example single-cell colorectal cancer data for MANTICORE
 #' @description
 #' A list bundling the inputs required to build and compare gene regulatory
-#' networks with SCORPION, derived from a colorectal cancer single-cell
+#' networks with MANTICORE, derived from a colorectal cancer single-cell
 #' RNA-sequencing experiment. It contains a gene expression matrix, a
 #' transcription factor motif prior, a protein-protein interaction prior, and
 #' cell-level metadata.
-#' @usage data(scorpionTest)
+#' @usage data(manticoreTest)
 #' @format A named list with four elements:
 #' \describe{
 #'   \item{\code{gex}}{A \code{dgCMatrix} gene expression matrix with 300 genes
@@ -25,8 +25,8 @@
 #' }
 #' @examples
 #' # Loading example data
-#' data(scorpionTest)
+#' data(manticoreTest)
 #'
 #' # The structure of the data
-#' str(scorpionTest)
+#' str(manticoreTest)
 NULL

@@ -28,21 +28,21 @@ devtools::install_github("kuijjerlab/SCORPION")
 
 ```r
 # Load example data
-data(scorpionTest)
+data(manticoreTest)
 
 # Construct a single regulatory network
 network <- scorpion(
-  tfMotifs = scorpionTest$tf,
-  gexMatrix = scorpionTest$gex,
-  ppiNet = scorpionTest$ppi
+  tfMotifs = manticoreTest$tf,
+  gexMatrix = manticoreTest$gex,
+  ppiNet = manticoreTest$ppi
 )
 
 # Construct networks stratified by cell groups
 networks <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "region"
 )
 ```
@@ -51,7 +51,7 @@ networks <- runSCORPION(
 
 ## Example Data
 
-The package includes `scorpionTest`, a dataset containing colorectal cancer single-cell RNA-seq data with the following components:
+The package includes `manticoreTest`, a dataset containing colorectal cancer single-cell RNA-seq data with the following components:
 
 | Object | Type | Description |
 |--------|------|-------------|
@@ -63,8 +63,8 @@ The package includes `scorpionTest`, a dataset containing colorectal cancer sing
 **Region codes:** T = Tumor, B = Border (adjacent normal), N = Normal
 
 ```r
-data(scorpionTest)
-str(scorpionTest)
+data(manticoreTest)
+str(manticoreTest)
 ```
 
 <details>
@@ -235,41 +235,41 @@ When more than one network type is requested via `outNet` (e.g. `c("regNet", "co
 ```r
 # Stratify by tissue region
 nets_by_region <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "region"
 )
 
 # Return multiple network types (adds an edge_type column, long format)
 nets_multi <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "region",
   outNet = c("regNet", "coregNet", "coopNet")
 )
 
 # Stratify by multiple variables
 nets_by_donor_region <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = c("donor", "region")
 )
 
 # With batch effect correction
 nets_corrected <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "region",
   removeBatchEffect = TRUE,
-  batch = scorpionTest$metadata$donor
+  batch = manticoreTest$metadata$donor
 )
 ```
 
@@ -337,10 +337,10 @@ A data frame containing:
 ```r
 # Build networks stratified by donor and region
 nets <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = c("donor", "region")
 )
 
@@ -678,7 +678,7 @@ res <- testEdges(
 circosEdges(
   edgesDF = res,
   species = "hsapiens_gene_ensembl",
-  priorNet = scorpionTest$tf,
+  priorNet = manticoreTest$tf,
   geneSets = "hallmark.gmt"
 )
 

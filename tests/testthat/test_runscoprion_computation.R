@@ -2,12 +2,12 @@
 # Validates that runMANTICORE() produces correct output structures and grouping
 
 test_that("runMANTICORE() accepts gexMatrix and tfMotifs parameters and returns data.frame", {
-  data(scorpionTest)
+  data(manticoreTest)
   result <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     showProgress = FALSE
   )
@@ -18,12 +18,12 @@ test_that("runMANTICORE() accepts gexMatrix and tfMotifs parameters and returns 
 })
 
 test_that("runMANTICORE() produces wide-format output with network columns", {
-  data(scorpionTest)
+  data(manticoreTest)
   result <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     showProgress = FALSE
   )
@@ -33,18 +33,18 @@ test_that("runMANTICORE() produces wide-format output with network columns", {
   expect_true(length(network_columns) > 0)
 
   # Check that network column names match the unique grouping values
-  unique_regions <- unique(scorpionTest$metadata$region)
+  unique_regions <- unique(manticoreTest$metadata$region)
   expect_true(all(unique_regions %in% network_columns))
 })
 
 # test_that("runMANTICORE() handles NULL ppiNet correctly", {
 #   skip("Skipped - implementation does not support NULL ppiNet")
-#   data(scorpionTest)
+#   data(manticoreTest)
 #   result <- runMANTICORE(
-#     gexMatrix = scorpionTest$gex,
-#     tfMotifs = scorpionTest$tf,
+#     gexMatrix = manticoreTest$gex,
+#     tfMotifs = manticoreTest$tf,
 #     ppiNet = NULL,
-#     cellsMetadata = scorpionTest$metadata,
+#     cellsMetadata = manticoreTest$metadata,
 #     groupBy = "region",
 #     showProgress = FALSE
 #   )
@@ -54,14 +54,14 @@ test_that("runMANTICORE() produces wide-format output with network columns", {
 # })
 
 test_that("runMANTICORE() selects correct output network with outNet parameter", {
-  data(scorpionTest)
+  data(manticoreTest)
 
   # Test with default outNet = "regNet"
   result_default <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     outNet = "regNet",
     showProgress = FALSE

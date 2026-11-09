@@ -58,12 +58,12 @@ Benjamini-Hochberg procedure.
 }
 \examples{
 \dontrun{
-data(scorpionTest)
+data(manticoreTest)
 nets <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = c("donor", "region")
 )
 res <- testEdges(

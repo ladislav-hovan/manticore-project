@@ -80,10 +80,10 @@ expression data into unified regulatory networks.
 }
 \examples{
 # Loading example data
-data(scorpionTest)
+data(manticoreTest)
 
 # The structure of the data
-str(scorpionTest)
+str(manticoreTest)
 
 # List of 4
 # $ gex     :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
@@ -116,9 +116,9 @@ str(scorpionTest)
 # Running SCORPION for epithelial cells from the normal tissue
 # We are using alphaValue = 0.8 for testing purposes (Default = 0.1).
 scorpionOutput <- scorpion(
-  tfMotifs = scorpionTest$tf,
-  gexMatrix = scorpionTest$gex[, scorpionTest$metadata$region == "N"],
-  ppiNet = scorpionTest$ppi,
+  tfMotifs = manticoreTest$tf,
+  gexMatrix = manticoreTest$gex[, manticoreTest$metadata$region == "N"],
+  ppiNet = manticoreTest$ppi,
   alphaValue = 0.8
 )
 

@@ -2,30 +2,30 @@
 # Validates that cells are grouped correctly and networks are created per group
 
 test_that("runMANTICORE() groups cells correctly for single groupBy column", {
-  data(scorpionTest)
+  data(manticoreTest)
   result <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     showProgress = FALSE
   )
   
   network_columns <- setdiff(colnames(result), c("tf", "target"))
-  expected_networks <- unique(scorpionTest$metadata$region)
+  expected_networks <- unique(manticoreTest$metadata$region)
   
   expect_equal(length(network_columns), length(expected_networks))
   expect_true(all(expected_networks %in% network_columns))
 })
 
 test_that("runMANTICORE() groups cells correctly for multiple groupBy columns", {
-  data(scorpionTest)
+  data(manticoreTest)
   result <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = c("donor", "region"),
     showProgress = FALSE
   )
@@ -38,14 +38,14 @@ test_that("runMANTICORE() groups cells correctly for multiple groupBy columns", 
 })
 
 test_that("runMANTICORE() respects minCells parameter for filtering", {
-  data(scorpionTest)
+  data(manticoreTest)
   
   # With minCells = 1, all groups should be included
   result_min_1 <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "donor",
     minCells = 1,
     showProgress = FALSE

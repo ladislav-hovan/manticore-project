@@ -3,6 +3,7 @@
 export(circosEdges)
 export(enrichEdges)
 export(maEdges)
+export(manticore)
 export(regressEdges)
 export(runMANTICORE)
 export(scorpion)
@@ -27,7 +28,9 @@ importFrom(dplyr,
   .data,
   filter,
   group_by,
-  mutate
+  mutate,
+  pull,
+  summarize
 )
 importFrom(furrr,
   furrr_options,
