@@ -2,22 +2,22 @@
 # Validates normalization, batch correction, and parameter passing
 
 test_that("runMANTICORE() parameter passing to scorpion() works with alphaValue", {
-  data(scorpionTest)
+  data(manticoreTest)
   result_alpha_low <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     alphaValue = 0.1,
     showProgress = FALSE
   )
   
   result_alpha_high <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     alphaValue = 0.8,
     showProgress = FALSE
@@ -32,22 +32,22 @@ test_that("runMANTICORE() parameter passing to scorpion() works with alphaValue"
 })
 
 test_that("runMANTICORE() data normalization affects results", {
-  data(scorpionTest)
+  data(manticoreTest)
   result_normalized <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     normalizeData = TRUE,
     showProgress = FALSE
   )
   
   result_unnormalized <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     normalizeData = FALSE,
     showProgress = FALSE
@@ -61,16 +61,16 @@ test_that("runMANTICORE() data normalization affects results", {
 })
 
 test_that("runMANTICORE() batch effect correction works with valid batch", {
-  data(scorpionTest)
+  data(manticoreTest)
   
   result <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     removeBatchEffect = TRUE,
-    batch = scorpionTest$metadata$donor,
+    batch = manticoreTest$metadata$donor,
     showProgress = FALSE
   )
   
@@ -79,13 +79,13 @@ test_that("runMANTICORE() batch effect correction works with valid batch", {
 })
 
 test_that("runMANTICORE() skips batch correction when batch has a single level", {
-  data(scorpionTest)
+  data(manticoreTest)
 
   args <- list(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     showProgress = FALSE
   )
@@ -96,7 +96,7 @@ test_that("runMANTICORE() skips batch correction when batch has a single level",
   expect_message(
     single_batch <- do.call(runMANTICORE, c(args, list(
       removeBatchEffect = TRUE,
-      batch = rep("b1", ncol(scorpionTest$gex))
+      batch = rep("b1", ncol(manticoreTest$gex))
     ))),
     "fewer than two levels"
   )

@@ -89,14 +89,14 @@ This function is a wrapper around \code{\link{scorpion}} that groups cells accor
 \examples{
 \dontrun{
 # Load test data
-data(scorpionTest)
+data(manticoreTest)
 
 # Example 1: Group by single column (region)
 nets_by_region <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "region"
 )
 
@@ -119,10 +119,10 @@ nets_by_region <- runSCORPION(
 
 # Example 2: Group by single column (donor)
 nets_by_donor <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "donor"
 )
 
@@ -144,10 +144,10 @@ nets_by_donor <- runSCORPION(
 
 # Example 3: Group by two columns (donor and region)
 nets_by_donor_region <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = c("donor", "region")
 )
 
@@ -169,10 +169,10 @@ nets_by_donor_region <- runSCORPION(
 
 # Example 4: Group by three columns (donor, region, and cell_type)
 nets_by_donor_region_cell_type <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = c("donor", "region", "cell_type")
 )
 
@@ -194,10 +194,10 @@ nets_by_donor_region_cell_type <- runSCORPION(
 
 # Example 5: Using GPU computing engine (if available)
 nets_gpu <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "region",
   computingEngine = "gpu"
 )
@@ -220,13 +220,13 @@ nets_gpu <- runSCORPION(
 
 # Example 6: Removing batch effect using donor as batch
 nets_batch_corrected <- runSCORPION(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = "region",
   removeBatchEffect = TRUE,
-  batch = scorpionTest$metadata$donor
+  batch = manticoreTest$metadata$donor
 )
 
 # -- SCORPION ----------------------------------------------------------------

@@ -2,11 +2,11 @@
 # Validates that scorpion() produces correct output structures with various parameters
 
 test_that("scorpion() accepts gexMatrix and tfMotifs and produces list output", {
-  data(scorpionTest)
+  data(manticoreTest)
   result <- scorpion(
-    tfMotifs = scorpionTest$tf,
-    gexMatrix = scorpionTest$gex[, 1:100],  # Small subset for speed
-    ppiNet = scorpionTest$ppi,
+    tfMotifs = manticoreTest$tf,
+    gexMatrix = manticoreTest$gex[, 1:100],  # Small subset for speed
+    ppiNet = manticoreTest$ppi,
     alphaValue = 0.8,
     showProgress = FALSE
   )
@@ -20,11 +20,11 @@ test_that("scorpion() accepts gexMatrix and tfMotifs and produces list output", 
 
 test_that("scorpion() works with NULL tfMotifs (co-expression only)", {
   skip("Skipped due to Matrix/gpuR dependency issues")
-  data(scorpionTest)
+  data(manticoreTest)
   result <- scorpion(
     tfMotifs = NULL,
-    gexMatrix = scorpionTest$gex[, 1:100],
-    ppiNet = scorpionTest$ppi,
+    gexMatrix = manticoreTest$gex[, 1:100],
+    ppiNet = manticoreTest$ppi,
     showProgress = FALSE
   )
   
@@ -34,10 +34,10 @@ test_that("scorpion() works with NULL tfMotifs (co-expression only)", {
 
 test_that("scorpion() works with NULL ppiNet", {
   skip("Skipped due to Matrix/gpuR dependency issues")
-  data(scorpionTest)
+  data(manticoreTest)
   result <- scorpion(
-    tfMotifs = scorpionTest$tf,
-    gexMatrix = scorpionTest$gex[, 1:100],
+    tfMotifs = manticoreTest$tf,
+    gexMatrix = manticoreTest$gex[, 1:100],
     ppiNet = NULL,
     showProgress = FALSE
   )
@@ -46,20 +46,20 @@ test_that("scorpion() works with NULL ppiNet", {
 })
 
 test_that("scorpion() alphaValue parameter changes output", {
-  data(scorpionTest)
+  data(manticoreTest)
   
   result_low <- scorpion(
-    tfMotifs = scorpionTest$tf,
-    gexMatrix = scorpionTest$gex[, 1:50],
-    ppiNet = scorpionTest$ppi,
+    tfMotifs = manticoreTest$tf,
+    gexMatrix = manticoreTest$gex[, 1:50],
+    ppiNet = manticoreTest$ppi,
     alphaValue = 0.1,
     showProgress = FALSE
   )
   
   result_high <- scorpion(
-    tfMotifs = scorpionTest$tf,
-    gexMatrix = scorpionTest$gex[, 1:50],
-    ppiNet = scorpionTest$ppi,
+    tfMotifs = manticoreTest$tf,
+    gexMatrix = manticoreTest$gex[, 1:50],
+    ppiNet = manticoreTest$ppi,
     alphaValue = 0.8,
     showProgress = FALSE
   )

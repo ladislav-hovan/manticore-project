@@ -130,12 +130,12 @@ Requires the \pkg{circlize} package, and \pkg{biomaRt} when gene
 }
 \examples{
 \dontrun{
-data(scorpionTest)
+data(manticoreTest)
 nets <- runMANTICORE(
-  gexMatrix = scorpionTest$gex,
-  tfMotifs = scorpionTest$tf,
-  ppiNet = scorpionTest$ppi,
-  cellsMetadata = scorpionTest$metadata,
+  gexMatrix = manticoreTest$gex,
+  tfMotifs = manticoreTest$tf,
+  ppiNet = manticoreTest$ppi,
+  cellsMetadata = manticoreTest$metadata,
   groupBy = c("donor", "region")
 )
 res <- testEdges(
@@ -149,7 +149,7 @@ res <- testEdges(
 circosEdges(
   edgesDF = res,
   species = "hsapiens_gene_ensembl",
-  priorNet = scorpionTest$tf,
+  priorNet = manticoreTest$tf,
   geneSets = "hallmark.gmt"
 )
 }

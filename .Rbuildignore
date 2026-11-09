@@ -9,3 +9,4 @@ tests/*
 ^\.github$
 .pixi/*
 pixi.toml
+pixi.lock

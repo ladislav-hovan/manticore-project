@@ -87,12 +87,12 @@
 #' \dontrun{
 #' # Load test data and build networks by donor and region
 #' # Note: T = Tumor, N = Normal, B = Border regions
-#' data(scorpionTest)
+#' data(manticoreTest)
 #' nets <- runMANTICORE(
-#'   gexMatrix = scorpionTest$gex,
-#'   tfMotifs = scorpionTest$tf,
-#'   ppiNet = scorpionTest$ppi,
-#'   cellsMetadata = scorpionTest$metadata,
+#'   gexMatrix = manticoreTest$gex,
+#'   tfMotifs = manticoreTest$tf,
+#'   ppiNet = manticoreTest$ppi,
+#'   cellsMetadata = manticoreTest$metadata,
 #'   groupBy = c("donor", "region")
 #' )
 #'

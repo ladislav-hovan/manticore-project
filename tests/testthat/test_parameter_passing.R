@@ -2,22 +2,22 @@
 # Validates that parameters are correctly passed from wrapper to core function
 
 test_that("scorpion() and runMANTICORE() share compatible parameter defaults", {
-  data(scorpionTest)
+  data(manticoreTest)
   
   # scorpion() with default parameters
   result_scorpion <- scorpion(
-    tfMotifs = scorpionTest$tf,
-    gexMatrix = scorpionTest$gex[, 1:100],
-    ppiNet = scorpionTest$ppi,
+    tfMotifs = manticoreTest$tf,
+    gexMatrix = manticoreTest$gex[, 1:100],
+    ppiNet = manticoreTest$ppi,
     showProgress = FALSE
   )
   
   # Both functions should work with default parameters
   result_runscoprion <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     showProgress = FALSE
   )
@@ -28,13 +28,13 @@ test_that("scorpion() and runMANTICORE() share compatible parameter defaults", {
 })
 
 test_that("runMANTICORE() correctly passes computingEngine parameter to scorpion()", {
-  data(scorpionTest)
+  data(manticoreTest)
   
   result_cpu <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     computingEngine = "cpu",
     showProgress = FALSE
@@ -45,13 +45,13 @@ test_that("runMANTICORE() correctly passes computingEngine parameter to scorpion
 })
 
 test_that("runMANTICORE() correctly passes nPC parameter to scorpion()", {
-  data(scorpionTest)
+  data(manticoreTest)
   
   result <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     nPC = 20,
     showProgress = FALSE
@@ -61,13 +61,13 @@ test_that("runMANTICORE() correctly passes nPC parameter to scorpion()", {
 })
 
 test_that("runMANTICORE() correctly passes assocMethod parameter to scorpion()", {
-  data(scorpionTest)
+  data(manticoreTest)
   
   result <- runMANTICORE(
-    gexMatrix = scorpionTest$gex,
-    tfMotifs = scorpionTest$tf,
-    ppiNet = scorpionTest$ppi,
-    cellsMetadata = scorpionTest$metadata,
+    gexMatrix = manticoreTest$gex,
+    tfMotifs = manticoreTest$tf,
+    ppiNet = manticoreTest$ppi,
+    cellsMetadata = manticoreTest$metadata,
     groupBy = "region",
     assocMethod = "pearson",
     showProgress = FALSE

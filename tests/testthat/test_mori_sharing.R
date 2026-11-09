@@ -7,10 +7,10 @@ test_that("runMANTICORE() with mori matches results without mori", {
   skip_if_not_installed("furrr")
   skip_if_not_installed("future")
 
-  data(scorpionTest)
+  data(manticoreTest)
 
   # Groups must each have enough cells to build a network (>= 30 cells).
-  groups <- table(scorpionTest$metadata$region)
+  groups <- table(manticoreTest$metadata$region)
   skip_if(sum(groups >= 30) < 2, "Need >= 2 groups with >= 30 cells for parallel test")
 
   old_opt <- getOption("scorpion.use_mori")
@@ -19,10 +19,10 @@ test_that("runMANTICORE() with mori matches results without mori", {
   run <- function() {
     set.seed(1)
     runMANTICORE(
-      gexMatrix = scorpionTest$gex,
-      tfMotifs = scorpionTest$tf,
-      ppiNet = scorpionTest$ppi,
-      cellsMetadata = scorpionTest$metadata,
+      gexMatrix = manticoreTest$gex,
+      tfMotifs = manticoreTest$tf,
+      ppiNet = manticoreTest$ppi,
+      cellsMetadata = manticoreTest$metadata,
       groupBy = "region",
       alphaValue = 0.8,
       nCores = 2L,
@@ -71,9 +71,9 @@ test_that("runMANTICORE() parallel performance with vs without mori", {
   skip_if_not_installed("furrr")
   skip_if_not_installed("future")
 
-  data(scorpionTest)
+  data(manticoreTest)
 
-  groups <- table(scorpionTest$metadata$region)
+  groups <- table(manticoreTest$metadata$region)
   skip_if(sum(groups >= 30) < 2, "Need >= 2 groups with >= 30 cells for parallel test")
 
   old_opt <- getOption("scorpion.use_mori")
@@ -81,10 +81,10 @@ test_that("runMANTICORE() parallel performance with vs without mori", {
 
   run <- function() {
     runMANTICORE(
-      gexMatrix = scorpionTest$gex,
-      tfMotifs = scorpionTest$tf,
-      ppiNet = scorpionTest$ppi,
-      cellsMetadata = scorpionTest$metadata,
+      gexMatrix = manticoreTest$gex,
+      tfMotifs = manticoreTest$tf,
+      ppiNet = manticoreTest$ppi,
+      cellsMetadata = manticoreTest$metadata,
       groupBy = "region",
       alphaValue = 0.8,
       nCores = 2L,
