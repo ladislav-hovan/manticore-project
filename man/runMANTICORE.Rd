@@ -2,7 +2,7 @@
 % Please edit documentation in R/runMANTICORE.R
 \name{runMANTICORE}
 \alias{runMANTICORE}
-\title{Run SCORPION across cell groups and return combined networks}
+\title{Run LIONESS across cell groups and return combined networks}
 \usage{
 runMANTICORE(
   gexMatrix,
@@ -49,7 +49,7 @@ runMANTICORE(
 
 \item{minCells}{Minimum number of cells per group required to build a network. Default is 30.}
 
-\item{computingEngine}{Either 'cpu' or 'gpu'. Passed to \code{\link{scorpion}}.}
+\item{computingEngine}{Either 'cpu' or 'gpu'. Passed to \code{\link{lioness_single}}.}
 
 \item{nCores}{Number of processors to be used if BLAS or MPI is active.}
 
@@ -81,10 +81,7 @@ runMANTICORE(
 A data.frame in wide format where rows represent TF-target pairs (union across all networks) and columns represent network identifiers. Cell values are edge weights from the corresponding network. When multiple network types are requested via \code{outNet}, an additional leading \code{edge_type} column identifies the network each row comes from and the network types are stacked in long format.
 }
 \description{
-Builds per-group regulatory networks by running \code{\link{scorpion}} on subsets of cells defined by \code{cellsMetadata} and combining the resulting networks into a wide-format data frame where each column corresponds to a network.
-}
-\details{
-This function is a wrapper around \code{\link{scorpion}} that groups cells according to metadata columns, filters out groups with insufficient cells, runs network inference on each remaining group independently, and finally combines all resulting networks into a single wide-format data frame.
+Builds per-supercell regulatory networks by running LIONESS on supercells from subsets of cells defined by \code{cellsMetadata} and combining the resulting networks into a wide-format data frame where each column corresponds to a network.
 }
 \examples{
 \dontrun{
@@ -248,8 +245,8 @@ nets_batch_corrected <- runSCORPION(
 }
 }
 \seealso{
-\code{\link{scorpion}}, \code{\link{testEdges}}, \code{\link{regressEdges}}
+\code{\link{testEdges}}, \code{\link{regressEdges}}
 }
 \author{
-Daniel Osorio <daniecos@uio.no>
+Ladislav Hovan <ladislav.hovan@ncmbm.uio.no>, Daniel Osorio <daniecos@uio.no>
 }

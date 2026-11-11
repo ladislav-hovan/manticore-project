@@ -1,6 +1,6 @@
-#' @title Run SCORPION across cell groups and return combined networks
-#' @description Builds per-group regulatory networks by running \code{\link{scorpion}} on subsets of cells defined by \code{cellsMetadata} and combining the resulting networks into a wide-format data frame where each column corresponds to a network.
-#' @author Daniel Osorio <daniecos@uio.no>
+#' @title Run LIONESS across cell groups and return combined networks
+#' @description Builds per-supercell regulatory networks by running LIONESS on supercells from subsets of cells defined by \code{cellsMetadata} and combining the resulting networks into a wide-format data frame where each column corresponds to a network.
+#' @author Ladislav Hovan <ladislav.hovan@ncmbm.uio.no>, Daniel Osorio <daniecos@uio.no>
 #' @param gexMatrix An expression dataset with genes in the rows and barcodes (cells) in the columns.
 #' @param tfMotifs A motif dataset, a data.frame or a matrix containing 3 columns. Each row describes a motif associated with a transcription factor (column 1) a gene (column 2) and a score (column 3).
 #' @param ppiNet A Protein-Protein-Interaction dataset, a data.frame or matrix containing 3 columns. Each row describes a protein-protein interaction between transcription factor 1 (column 1), transcription factor 2 (column 2) and a score (column 3).
@@ -10,7 +10,7 @@
 #' @param removeBatchEffect Boolean to indicate batch effect correction. Default FALSE.
 #' @param batch Factor or vector giving batch assignment for each cell; required if \code{removeBatchEffect = TRUE}.
 #' @param minCells Minimum number of cells per group required to build a network. Default is 30.
-#' @param computingEngine Either 'cpu' or 'gpu'. Passed to \code{\link{scorpion}}.
+#' @param computingEngine Either 'cpu' or 'gpu'. Passed to \code{\link{lioness_single}}.
 #' @param nCores Number of processors to be used if BLAS or MPI is active.
 #' @param gammaValue Graining level of data (proportion of number of single cells to super-cells). Default 10.
 #' @param nPC Number of principal components to use for kNN network construction. Default 25.
@@ -25,9 +25,7 @@
 #' @param scaleByPresent Boolean to indicate scaling of correlations by percentage of positive samples. Default FALSE.
 #' @param filterExpr Boolean to indicate whether or not to remove genes with 0 expression across all cells. Default FALSE.
 #' @return A data.frame in wide format where rows represent TF-target pairs (union across all networks) and columns represent network identifiers. Cell values are edge weights from the corresponding network. When multiple network types are requested via \code{outNet}, an additional leading \code{edge_type} column identifies the network each row comes from and the network types are stacked in long format.
-#' @seealso \code{\link{scorpion}}, \code{\link{testEdges}}, \code{\link{regressEdges}}
-#' @details
-#' This function is a wrapper around \code{\link{scorpion}} that groups cells according to metadata columns, filters out groups with insufficient cells, runs network inference on each remaining group independently, and finally combines all resulting networks into a single wide-format data frame.
+#' @seealso \code{\link{testEdges}}, \code{\link{regressEdges}}
 #' @examples
 #' \dontrun{
 #' # Load test data
@@ -356,7 +354,7 @@ runMANTICORE <- function(
 
   # Applies LIONESS to an expression chunk with a single missing column
   compute_network <- function(sample) {
-    network <- manticore(
+    network <- lioness_single(
       gexAdjusted = gexAdjusted,
       tfMotifs = tfMotifs,
       ppiNet = ppiNet,

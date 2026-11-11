@@ -1,7 +1,7 @@
 Package: MANTICORE
 Type: Package
-Title: MANTICORE: The SCORPION/LIONESS hybrid method
-Version: 0.1.0
+Title: MANTICORE: Modeling Adaptive Networks through Targeted Inference of Cell-specific Omics-derived Regulatory Edges
+Version: 0.2.0
 Authors@R: c(
   person("Ladislav", "Hovan", email = "ladislav.hovan@ncmbm.uio.no", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8847-9295")),
   person("Daniel", "Osorio", email = "daniecos@uio.no", role = c("aut"), comment = c(ORCID = "0000-0003-4424-8422")),

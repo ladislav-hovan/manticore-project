@@ -1,25 +1,34 @@
-# <img src="https://raw.githubusercontent.com/kuijjerlab/SCORPION/main/inst/logoSCORPION.png" width="30" title="SCORPION"> SCORPION
+# MANTICORE
 
-[![R-CMD-check](https://github.com/kuijjerlab/SCORPION/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kuijjerlab/SCORPION/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/ladislav-hovan/manticore-project/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ladislav-hovan/manticore-project/actions/workflows/R-CMD-check.yaml)
 
-**SCORPION** (**S**ingle-**C**ell **O**riented **R**econstruction of **P**ANDA **I**ndividually **O**ptimized Gene Regulatory **N**etworks) is an R package for constructing gene regulatory networks from single-cell and single-nucleus RNA sequencing data. The package addresses the sparsity inherent in single-cell expression data through coarse-graining, which aggregates similar cells to improve correlation structure detection. Network reconstruction is performed using the PANDA (Passing Attributes between Networks for Data Assimilation) message-passing algorithm, integrating transcription factor motifs, protein-protein interactions, and gene expression data. By using consistent baseline priors across samples, SCORPION produces comparable, fully-connected, weighted regulatory networks suitable for population-level analyses.
-
-
-![method](https://raw.githubusercontent.com/kuijjerlab/SCORPION/main/inst/methodSCORPION.png)
+**MANTICORE** (**M**odeling **A**daptive **N**etworks through **T**argeted **I**nference of **C**ell-specific **O**mics-derived **R**egulatory **E**dges) is an R package for constructing gene regulatory networks from single-cell and single-nucleus RNA sequencing data.
+It is based on [SCORPION](https://github.com/kuijjerlab/SCORPION), but the approach is extended by applying the LIONESS equation to reconstruct networks for the individual supercells.
+The sparsity inherent in single-cell expression data is addressed through coarse-graining, which aggregates similar cells to improve correlation structure detection.
+Network reconstruction is performed using the PANDA (Passing Attributes between Networks for Data Assimilation) message-passing algorithm, integrating transcription factor motifs, protein-protein interactions, and gene expression data.
+Finally, the LIONESS (Linear Interpolation to Obtain Network Estimates for Single Samples) approach is used, generating supercell-specific networks by reapplying the PANDA algorithm while leaving each sample out in turn.
+The resulting regulatory networks are fully-connected and weighted, as well as sharing the same background.
+This allows us to look at subpopulations within a group of single cells, even rare ones whose networks would be impossible to directly reconstruct with SCORPION.
 
 
 ## Installation
-SCORPION is available on CRAN:
+MANTICORE is currently not available on CRAN.
+We recommend installing from this GitHub repository:
 
 ```r
-install.packages("SCORPION")
-library(SCORPION)
+devtools::install_github("ladislav-hovan/manticore-project")
 ```
 
-To install the development version from GitHub:
+Alternatively, to setup the provided pixi environment:
 
-```r
-devtools::install_github("kuijjerlab/SCORPION")
+```
+git clone https://github.com/ladislav-hovan/manticore-project.git
+cd manticore-project
+# Install the project into the local pixi environment
+# This will also setup the environment on the first use
+pixi run install-local
+# Pixi-managed R installation - not the system one
+pixi run R
 ```
 
 ---
@@ -30,15 +39,8 @@ devtools::install_github("kuijjerlab/SCORPION")
 # Load example data
 data(manticoreTest)
 
-# Construct a single regulatory network
-network <- scorpion(
-  tfMotifs = manticoreTest$tf,
-  gexMatrix = manticoreTest$gex,
-  ppiNet = manticoreTest$ppi
-)
-
 # Construct networks stratified by cell groups
-networks <- runSCORPION(
+networks <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -98,79 +100,14 @@ $ metadata:'data.frame': 1954 obs. of  4 variables:
 
 ## Core Functions
 
-### scorpion
-
-Constructs a single gene regulatory network from a gene expression matrix using coarse-graining and the PANDA algorithm.
-
-**Usage:**
-
-```r
-result <- scorpion(
-  tfMotifs = NULL,
-  gexMatrix,
-  ppiNet = NULL,
-  computingEngine = "cpu",
-  nCores = 1,
-  gammaValue = 10,
-  nPC = 25,
-  assocMethod = "pearson",
-  alphaValue = 0.1,
-  hammingValue = 0.001,
-  nIter = Inf,
-  outNet = c("regNet", "coregNet", "coopNet"),
-  zScaling = TRUE,
-  showProgress = TRUE,
-  randomizationMethod = "None",
-  scaleByPresent = FALSE,
-  filterExpr = FALSE
-)
-```
-
-**Parameters:**
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `tfMotifs` | Data frame with columns [TF, target gene, motif score]. Pass `NULL` for co-expression analysis only | NULL |
-| `gexMatrix` | Expression matrix with genes in rows and cells in columns | Required |
-| `ppiNet` | Data frame with columns [protein1, protein2, interaction score]. Pass `NULL` to disable PPI integration | NULL |
-| `computingEngine` | Computation backend: `cpu` or `gpu` | `cpu` |
-| `nCores` | Number of processors for BLAS/MPI parallel computation | 1 |
-| `gammaValue` | Coarse-graining level; ratio of cells to super-cells | 10 |
-| `nPC` | Number of principal components for kNN network construction | 25 |
-| `assocMethod` | Gene association method: `pearson`, `spearman`, or `pcNet` | `pearson` |
-| `alphaValue` | Weight of prior networks relative to expression data (0–1) | 0.1 |
-| `hammingValue` | Convergence threshold based on Hamming distance | 0.001 |
-| `nIter` | Maximum number of PANDA iterations before stopping | Inf |
-| `outNet` | Networks to return: `regNet`, `coregNet`, and/or `coopNet` | All three |
-| `zScaling` | Return Z-score normalized edge weights; `FALSE` returns [0,1] scale | TRUE |
-| `showProgress` | Print progress messages during computation | TRUE |
-| `randomizationMethod` | Randomization for null models: `None`, `within.gene`, or `by.gene` | `None` |
-| `scaleByPresent` | Scale correlations by percentage of cells with non-zero expression | FALSE |
-| `filterExpr` | Remove genes with zero expression across all cells before inference | FALSE |
-
-**Return value:**
-
-A list containing:
-
-| Component | Description |
-|-----------|-------------|
-| `regNet` | Regulatory network matrix (TFs × target genes) |
-| `coregNet` | Co-regulation network matrix (genes × genes) |
-| `coopNet` | TF cooperation network matrix (TFs × TFs) |
-| `numGenes` | Number of genes in the network |
-| `numTFs` | Number of transcription factors |
-| `numEdges` | Total number of edges in the regulatory network |
-
----
-
-### runSCORPION
+### runMANTICORE
 
 Constructs regulatory networks for multiple cell groups defined by metadata columns. This function wraps `scorpion()` to enable stratified network inference and returns results in a format suitable for comparative analysis.
 
 **Usage:**
 
 ```r
-networks <- runSCORPION(
+networks <- runMANTICORE(
   gexMatrix,
   tfMotifs,
   ppiNet,
@@ -234,7 +171,7 @@ When more than one network type is requested via `outNet` (e.g. `c("regNet", "co
 
 ```r
 # Stratify by tissue region
-nets_by_region <- runSCORPION(
+nets_by_region <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -243,7 +180,7 @@ nets_by_region <- runSCORPION(
 )
 
 # Return multiple network types (adds an edge_type column, long format)
-nets_multi <- runSCORPION(
+nets_multi <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -253,7 +190,7 @@ nets_multi <- runSCORPION(
 )
 
 # Stratify by multiple variables
-nets_by_donor_region <- runSCORPION(
+nets_by_donor_region <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -262,7 +199,7 @@ nets_by_donor_region <- runSCORPION(
 )
 
 # With batch effect correction
-nets_corrected <- runSCORPION(
+nets_corrected <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -274,6 +211,11 @@ nets_corrected <- runSCORPION(
 ```
 
 ---
+
+## WARNING: Documentation potentially misleading
+
+The sections below contain functions which have not been modified from SCORPION, but they have also not been tested with the changed interface.
+Therefore, they could fail in unexpected ways, and this documentation will be updated in the future.
 
 ## Statistical Analysis
 
@@ -304,7 +246,7 @@ results <- testEdges(
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `networksDF` | Output from `runSCORPION()` | Required |
+| `networksDF` | Output from `runMANTICORE()` | Required |
 | `testType` | Test type: `single` (one-sample) or `two.sample` | Required |
 | `group1` | Column names for the first (or only) group | Required |
 | `group2` | Column names for the second group (two-sample tests) | NULL |
@@ -336,7 +278,7 @@ A data frame containing:
 
 ```r
 # Build networks stratified by donor and region
-nets <- runSCORPION(
+nets <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -397,7 +339,7 @@ results <- regressEdges(
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `networksDF` | Output from `runSCORPION()` | Required |
+| `networksDF` | Output from `runMANTICORE()` | Required |
 | `orderedGroups` | Named list of column name vectors; list order defines progression | Required |
 | `padjustMethod` | Multiple testing correction method | `BH` |
 | `minMeanEdge` | Minimum mean absolute edge weight for inclusion | 0 |
@@ -696,7 +638,8 @@ circosEdges(res, geneCoords = coords)
 
 ## Citation
 
-If you use SCORPION in your research, please cite:
+There is no separate MANTICORE publication at the moment.
+If you do use it, please cite the SCORPION publication for now:
 
 > Osorio, D., Capasso, A., Eckhardt, S.G. et al. Population-level comparisons of gene regulatory networks modeled on high-throughput single-cell transcriptomics data. *Nature Computational Science* **4**, 237–250 (2024). https://doi.org/10.1038/s43588-024-00597-5
 
@@ -704,6 +647,4 @@ If you use SCORPION in your research, please cite:
 
 ## Additional Resources
 
-- **Supplementary Materials:** [https://github.com/dosorio/SCORPION/](https://github.com/dosorio/SCORPION/)
-- **Issue Tracker:** [https://github.com/kuijjerlab/SCORPION/issues](https://github.com/kuijjerlab/SCORPION/issues)
-- **CRAN Package Page:** [https://cran.r-project.org/package=SCORPION](https://cran.r-project.org/package=SCORPION)
+- **Issue Tracker:** [https://github.com/ladislav-hovan/manticore-project/issues](https://github.com/ladislav-hovan/manticore-project/issues)

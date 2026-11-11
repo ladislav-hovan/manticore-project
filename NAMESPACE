@@ -2,11 +2,10 @@
 
 export(circosEdges)
 export(enrichEdges)
+export(lioness_single)
 export(maEdges)
-export(manticore)
 export(regressEdges)
 export(runMANTICORE)
-export(scorpion)
 export(testEdges)
 import(Matrix)
 import(cli)
