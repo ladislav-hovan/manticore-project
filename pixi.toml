@@ -11,6 +11,8 @@ name = "pixi-build-r"
 channel = "conda-forge"
 
 [tasks]
+full-setup = { depends-on = ["install-gpur", "install-local", "install-mori"] }
+install-gpur = "R -e 'remotes::install_github(\"dosorio/gpuR\")'"
 install-local = "R CMD INSTALL ./"
 install-mori = "R -e 'install.packages(\"mori\", repos = \"https://cloud.r-project.org\")'"
 
@@ -29,4 +31,5 @@ r-irlba = ">=2.4.1,<3"
 r-matrix = ">=1.7_6,<2"
 r-pbapply = ">=1.7_4,<2"
 r-rann = ">=2.6.2,<3"
+r-remotes = ">=2.5.0,<3"
 r-rhpcblasctl = ">=0.23_42,<0.24"
