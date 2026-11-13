@@ -143,7 +143,7 @@ makeSuperCells <- function(
 
   sc.nw <-
     buildKNN(
-      X = PCA.presampled$x[, n.pc],
+      X = PCA.presampled$x[, min(n.pc, ncol(PCA.presampled$x))],
       k = k.knn,
       from = "coordinates",
       use.nn2 = use.nn2,

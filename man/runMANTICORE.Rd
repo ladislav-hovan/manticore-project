@@ -89,7 +89,7 @@ Builds per-supercell regulatory networks by running LIONESS on supercells from s
 data(manticoreTest)
 
 # Example 1: Group by single column (region)
-nets_by_region <- runSCORPION(
+nets_by_region <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -97,25 +97,34 @@ nets_by_region <- runSCORPION(
   groupBy = "region"
 )
 
-# -- SCORPION ----------------------------------------------------------------
+# -- MANTICORE -------------------------------------------------------------
 # + Normalizing data (log scale)
-# i 3 networks requested
-# + 3 networks meet the minimum cell requirement (30)
-# i Computing networks
-# + Networks successfully constructed
-# + Networks successfully combined
+# i 3 groups requested
+# + 3 groups meet the minimum cell requirement (10)
+# i Computing the background PANDA network
+# + Initializing and validating
+# + Verified sufficient samples
+# i Normalizing networks
+# i Learning network
+# i Using tanimoto similarity
+# i Successfully ran PANDA on 281 Genes and 963 TFs
+# i Time elapsed: 3.99 seconds
+# i Computing 18 networks
+# i Networks successfully constructed
+# i Total time elapsed: 68.53 seconds
+# i Networks successfully combined
 
 # head(nets_by_region)
-#                           tf target           T          B           N
-# 1                       AATF  ACKR1 -0.31433856 -0.3569918 -0.33734920
-# 2                       ABL1  ACKR1 -0.32915008 -0.3648895 -0.34437341
-# 3                      ACSS2  ACKR1 -0.31418599 -0.3557854 -0.33663144
-# 4                       ADNP  ACKR1  0.04105895  0.1109288  0.09910822
-# 5                      AEBP2  ACKR1 -0.18964574 -0.2202269 -0.17558140
-# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.31024700 -0.3508320 -0.33054519
+#                           tf target        T_1        T_2        T_3        T_4
+# 1                       AATF  ACKR1 -0.2941782 -0.3354834 -0.3320515 -0.3251915
+# 2                       ABL1  ACKR1 -0.3179234 -0.3571915 -0.3548165 -0.3481596
+# 3                      ACSS2  ACKR1 -0.2947110 -0.3352503 -0.3322968 -0.3254164
+# 4                       ADNP  ACKR1  0.2259662  0.2433903  0.2599372  0.2385351
+# 5                      AEBP2  ACKR1 -0.1653191 -0.2347701 -0.1767304 -0.1722081
+# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.2957854 -0.3360431 -0.3333447 -0.3264213
 
 # Example 2: Group by single column (donor)
-nets_by_donor <- runSCORPION(
+nets_by_donor <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -123,24 +132,34 @@ nets_by_donor <- runSCORPION(
   groupBy = "donor"
 )
 
-# -- SCORPION ----------------------------------------------------------------
+# -- MANTICORE -------------------------------------------------------------
 # + Normalizing data (log scale)
-# i 3 networks requested
-# + 3 networks meet the minimum cell requirement (30)
-# i Computing networks
+# i 3 groups requested
+# + 3 groups meet the minimum cell requirement (10)
+# i Computing the background PANDA network
+# + Initializing and validating
+# + Verified sufficient samples
+# i Normalizing networks
+# i Learning network
+# i Using tanimoto similarity
+# + Successfully ran PANDA on 281 Genes and 963 TFs
+# i Time elapsed: 6.17 seconds
+# i Computing 18 networks
 # + Networks successfully constructed
+# i Total time elapsed: 71.37 seconds
 # + Networks successfully combined
+
 # head(nets_by_donor)
-#                           tf target         P31        P32         P33
-# 1                       AATF  ACKR1 -0.34869366 -0.3557884 -0.35010835
-# 2                       ABL1  ACKR1 -0.33724323 -0.3575331 -0.32875974
-# 3                      ACSS2  ACKR1 -0.34569954 -0.3573108 -0.34980657
-# 4                       ADNP  ACKR1  0.09933951  0.1045316  0.06046914
-# 5                      AEBP2  ACKR1 -0.25111137 -0.2245655 -0.23157035
-# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.34148264 -0.3518686 -0.34398594
+#                           tf target      P31_1      P31_2      P31_3      P31_4
+# 1                       AATF  ACKR1 -0.3202550 -0.3172555 -0.2880045 -0.3367420
+# 2                       ABL1  ACKR1 -0.3472954 -0.3409893 -0.3149934 -0.3576329
+# 3                      ACSS2  ACKR1 -0.3206402 -0.3174249 -0.2885667 -0.3367325
+# 4                       ADNP  ACKR1  0.2145595  0.2399915  0.2239300  0.2414298
+# 5                      AEBP2  ACKR1 -0.1670806 -0.1670767 -0.1642898 -0.1716003
+# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.3222239 -0.3183888 -0.2899739 -0.3373061
 
 # Example 3: Group by two columns (donor and region)
-nets_by_donor_region <- runSCORPION(
+nets_by_donor_region <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -148,24 +167,34 @@ nets_by_donor_region <- runSCORPION(
   groupBy = c("donor", "region")
 )
 
-# -- SCORPION ----------------------------------------------------------------
+# -- MANTICORE -------------------------------------------------------------
 # + Normalizing data (log scale)
-# i 9 networks requested
-# + 9 networks meet the minimum cell requirement (30)
-# i Computing networks
+# i 9 groups requested
+# + 9 groups meet the minimum cell requirement (10)
+# i Computing the background PANDA network
+# + Initializing and validating
+# + Verified sufficient samples
+# i Normalizing networks
+# i Learning network
+# i Using tanimoto similarity
+# + Successfully ran PANDA on 281 Genes and 963 TFs
+# i Time elapsed: 3.77 seconds
+# i Computing 18 networks
 # + Networks successfully constructed
+# i Total time elapsed: 70.28 seconds
 # + Networks successfully combined
+
 # head(nets_by_donor_region)
-#                           tf target      P31--T      P31--B     P31--N
-# 1                       AATF  ACKR1 -0.32634975 -0.33717677 -0.3442886
-# 2                       ABL1  ACKR1 -0.34048759 -0.33890429 -0.3509986
-# 3                      ACSS2  ACKR1 -0.32570697 -0.33600811 -0.3436603
-# 4                       ADNP  ACKR1  0.07975735  0.05354279  0.1048301
-# 5                      AEBP2  ACKR1 -0.21472437 -0.20545660 -0.1815737
-# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.31861592 -0.32809314 -0.3375652
+#                           tf target   P31--T_1   P31--T_2   P31--B_1   P31--B_2
+# 1                       AATF  ACKR1 -0.3190902 -0.2185745 -0.3152367 -0.3230080
+# 2                       ABL1  ACKR1 -0.3408164 -0.2572263 -0.3390597 -0.3470957
+# 3                      ACSS2  ACKR1 -0.3194359 -0.2202008 -0.3154443 -0.3227614
+# 4                       ADNP  ACKR1  0.2474420  0.1767450  0.2361739  0.2282932
+# 5                      AEBP2  ACKR1 -0.1641631 -0.1094063 -0.1629011 -0.1673652
+# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.3200036 -0.2212101 -0.3168823 -0.3244148
 
 # Example 4: Group by three columns (donor, region, and cell_type)
-nets_by_donor_region_cell_type <- runSCORPION(
+nets_by_donor_region_cell_type <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -173,24 +202,34 @@ nets_by_donor_region_cell_type <- runSCORPION(
   groupBy = c("donor", "region", "cell_type")
 )
 
-# -- SCORPION ----------------------------------------------------------------
+# -- MANTICORE -----------------------------------
 # + Normalizing data (log scale)
-# i 9 networks requested
-# + 9 networks meet the minimum cell requirement (30)
-# i Computing networks
+# i 9 groups requested
+# + 9 groups meet the minimum cell requirement (10)
+# i Computing the background PANDA network
+# + Initializing and validating
+# + Verified sufficient samples
+# i Normalizing networks
+# i Learning network
+# i Using tanimoto similarity
+# + Successfully ran PANDA on 281 Genes and 963 TFs
+# i Time elapsed: 3.84 seconds
+# i Computing 18 networks
 # + Networks successfully constructed
+# i Total time elapsed: 67.65 seconds
 # + Networks successfully combined
+
 # head(nets_by_donor_region_cell_type)
-#                           tf target P31--T--Epithelial P31--B--Epithelial
-# 1                       AATF  ACKR1        -0.32634975        -0.33717677
-# 2                       ABL1  ACKR1        -0.34048759        -0.33890429
-# 3                      ACSS2  ACKR1        -0.32570697        -0.33600811
-# 4                       ADNP  ACKR1         0.07975735         0.05354279
-# 5                      AEBP2  ACKR1        -0.21472437        -0.20545660
-# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1        -0.31861592        -0.32809314
+#                           tf target P31--T--Epithelial_1 P31--T--Epithelial_2
+# 1                       AATF  ACKR1           -0.3190902           -0.2185745
+# 2                       ABL1  ACKR1           -0.3408164           -0.2572263
+# 3                      ACSS2  ACKR1           -0.3194359           -0.2202008
+# 4                       ADNP  ACKR1            0.2474420            0.1767450
+# 5                      AEBP2  ACKR1           -0.1641631           -0.1094063
+# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1           -0.3200036           -0.2212101
 
 # Example 5: Using GPU computing engine (if available)
-nets_gpu <- runSCORPION(
+nets_gpu <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -199,24 +238,34 @@ nets_gpu <- runSCORPION(
   computingEngine = "gpu"
 )
 
-# -- SCORPION ----------------------------------------------------------------
+# -- MANTICORE -------------------------------------------------------------
 # + Normalizing data (log scale)
-# i 3 networks requested
-# + 3 networks meet the minimum cell requirement (30)
-# i Computing networks
+# i 3 groups requested
+# + 3 groups meet the minimum cell requirement (10)
+# i Computing the background PANDA network
+# + Initializing and validating
+# + Verified sufficient samples
+# i Normalizing networks
+# i Learning network
+# i Using tanimoto similarity
+# + Successfully ran PANDA on 281 Genes and 963 TFs
+# i Time elapsed: 5.14 seconds
+# i Computing 18 networks
 # + Networks successfully constructed
+# i Total time elapsed: 104.15 seconds
 # + Networks successfully combined
+
 # head(nets_gpu)
-#                           tf target           T          B           N
-# 1                       AATF  ACKR1 -0.31433821 -0.3569913 -0.33734894
-# 2                       ABL1  ACKR1 -0.32915005 -0.3648892 -0.34437302
-# 3                      ACSS2  ACKR1 -0.31418574 -0.3557851 -0.33663106
-# 4                       ADNP  ACKR1  0.04105883  0.1109285  0.09910798
-# 5                      AEBP2  ACKR1 -0.18964562 -0.2202267 -0.17558131
-# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.31024694 -0.3508317 -0.33054504
+#                           tf target        T_1        T_2        T_3        T_4
+# 1                       AATF  ACKR1 -0.3149668 -0.2882942 -0.3105499 -0.2644840
+# 2                       ABL1  ACKR1 -0.3384307 -0.3121278 -0.3344031 -0.2886737
+# 3                      ACSS2  ACKR1 -0.3147451 -0.2885594 -0.3110744 -0.2651064
+# 4                       ADNP  ACKR1  0.2332610  0.2142980  0.2519617  0.2150365
+# 5                      AEBP2  ACKR1 -0.1630593 -0.1639258 -0.1621088 -0.1211030
+# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.3163287 -0.2902277 -0.3113921 -0.2666489
 
 # Example 6: Removing batch effect using donor as batch
-nets_batch_corrected <- runSCORPION(
+nets_batch_corrected <- runMANTICORE(
   gexMatrix = manticoreTest$gex,
   tfMotifs = manticoreTest$tf,
   ppiNet = manticoreTest$ppi,
@@ -226,22 +275,32 @@ nets_batch_corrected <- runSCORPION(
   batch = manticoreTest$metadata$donor
 )
 
-# -- SCORPION ----------------------------------------------------------------
+# -- MANTICORE -------------------------------------------------------------
 # + Normalizing data (log scale)
 # + Correcting for batch effects
-# i 3 networks requested
-# + 3 networks meet the minimum cell requirement (30)
-# i Computing networks
+# i 3 groups requested
+# + 3 groups meet the minimum cell requirement (10)
+# i Computing the background PANDA network
+# + Initializing and validating
+# + Verified sufficient samples
+# i Normalizing networks
+# i Learning network
+# i Using tanimoto similarity
+# + Successfully ran PANDA on 281 Genes and 963 TFs
+# i Time elapsed: 3.66 seconds
+# i Computing 18 networks
 # + Networks successfully constructed
+# i Total time elapsed: 66.84 seconds
 # + Networks successfully combined
+
 # head(nets_batch_corrected)
-#                           tf target          T           B           N
-# 1                       AATF  ACKR1 -0.3337298 -0.34885471 -0.13011777
-# 2                       ABL1  ACKR1 -0.3408020 -0.35409813 -0.17694266
-# 3                      ACSS2  ACKR1 -0.3325270 -0.35115311 -0.12661518
-# 4                       ADNP  ACKR1  0.1117504  0.08691481  0.01608898
-# 5                      AEBP2  ACKR1 -0.2334648 -0.22113011  0.12519312
-# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.3274770 -0.34475499 -0.12449908
+#                           tf target        T_1        T_2        T_3        T_4
+# 1                       AATF  ACKR1 -0.2962846 -0.3274905 -0.2734708 -0.3312162
+# 2                       ABL1  ACKR1 -0.3224845 -0.3490377 -0.3011509 -0.3564239
+# 3                      ACSS2  ACKR1 -0.2971183 -0.3278750 -0.2746225 -0.3306292
+# 4                       ADNP  ACKR1  0.2216245  0.2543183  0.2191569  0.2430913
+# 5                      AEBP2  ACKR1 -0.1643446 -0.0555660 -0.1490343 -0.1655627
+# 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.2991352 -0.3258038 -0.2779301 -0.3312577
 }
 }
 \seealso{
