@@ -27,14 +27,14 @@ runPANDA <- function(
   }
 
   if (is.null(expr)) {
-    # Use only the motif data here for the gene list
     num.conditions <- 0
     if (randomize != "None") {
       cli::cli_alert_danger("Randomization ignored because gene expression is not used.")
       randomize <- "None"
     }
-  } else {
-    if (mode == "legacy") {
+  }
+  if (mode == "legacy") {
+    if (!is.null(expr)) {
       if (remove.missing.genes) {
         # remove genes from expression data that are not in the motif data
         n <- nrow(expr)
@@ -47,72 +47,22 @@ runPANDA <- function(
         motif <- motif[which(motif[, 2] %in% rownames(expr)), ]
         cli::cli_alert_danger(sprintf("%s motif edges removed that targeted genes missing in expression data", n - nrow(motif)))
       }
-      # Use the motif data AND the expr data (if provided) for the gene list
       # Keep everything sorted alphabetically
       expr <- expr[order(rownames(expr)), ]
-    } else if (mode == "union") {
-      gene.names <- unique(union(rownames(expr), unique(motif[, 2])))
-      tf.names <- unique(union(unique(ppi[, 1]), unique(motif[, 1])))
-      num.TFs <- length(tf.names)
-      num.genes <- length(gene.names)
-      # gene expression matrix
-      expr1 <- as.data.frame(matrix(0, num.genes, ncol(expr)))
-      rownames(expr1) <- gene.names
-      expr1[which(gene.names %in% rownames(expr)), ] <- expr[]
-      expr <- expr1
-      # PPI matrix
-      tfCoopNetwork <- matrix(0, num.TFs, num.TFs)
-      colnames(tfCoopNetwork) <- tf.names
-      rownames(tfCoopNetwork) <- tf.names
-      Idx1 <- match(ppi[, 1], tf.names)
-      Idx2 <- match(ppi[, 2], tf.names)
-      Idx <- (Idx2 - 1) * num.TFs + Idx1
-      tfCoopNetwork[Idx] <- ppi[, 3]
-      Idx <- (Idx1 - 1) * num.TFs + Idx2
-      tfCoopNetwork[Idx] <- ppi[, 3]
-      # Motif matrix
-      regulatoryNetwork <- matrix(0, num.TFs, num.genes)
-      colnames(regulatoryNetwork) <- gene.names
-      rownames(regulatoryNetwork) <- tf.names
-      Idx1 <- match(motif[, 1], tf.names)
-      Idx2 <- match(motif[, 2], gene.names)
-      Idx <- (Idx2 - 1) * num.TFs + Idx1
-      regulatoryNetwork[Idx] <- motif[, 3]
-    } else if (mode == "intersection") {
-      gene.names <- sort(intersect(rownames(expr), motif[, 2]))
-      tf.names <- sort(intersect(unique(c(ppi[, 1], ppi[, 2])), motif[, 1]))
-      num.TFs <- length(tf.names)
-      num.genes <- length(gene.names)
-
-      # Gene expression matrix
-      expr <- expr[gene.names, ]
-
-      # PPI matrix
-      ppi <- ppi[ppi[, 1] %in% tf.names, ]
-      ppi <- ppi[ppi[, 2] %in% tf.names, ]
-      tfCoopNetwork <- matrix(0, num.TFs, num.TFs, dimnames = list(tf.names, tf.names))
-      Idx1 <- match(ppi[, 1], tf.names)
-      Idx2 <- match(ppi[, 2], tf.names)
-      Idx <- (Idx2 - 1) * num.TFs + Idx1
-      tfCoopNetwork[Idx] <- ppi[, 3]
-      # Symmetrize the PPI matrix: average bidirectional edges,
-      # keep weight for unidirectional edges
-      both_present <- (tfCoopNetwork != 0) & (t(tfCoopNetwork) != 0)
-      tfCoopNetwork <- tfCoopNetwork + t(tfCoopNetwork)
-      tfCoopNetwork[both_present] <- tfCoopNetwork[both_present] / 2
-      # Set diagonal to 1 (self-cooperation) to match Python behavior
-      diag(tfCoopNetwork) <- 1
-
-      # Motif matrix
-      motif <- motif[motif[, 1] %in% tf.names, ]
-      motif <- motif[motif[, 2] %in% gene.names, ]
-      regulatoryNetwork <- matrix(0, num.TFs, num.genes, dimnames = list(tf.names, gene.names))
-      Idx1 <- match(motif[, 1], tf.names)
-      Idx2 <- match(motif[, 2], gene.names)
-      Idx <- (Idx2 - 1) * num.TFs + Idx1
-      regulatoryNetwork[Idx] <- motif[, 3]
     }
-
+  } else if (mode %in% c("union", "intersection")) {
+    # Same matching as netZooPy's Panda (see .pandaInputs)
+    inputs <- .pandaInputs(motif, expr, ppi, mode)
+    expr <- inputs$expr
+    regulatoryNetwork <- inputs$regulatoryNetwork
+    tfCoopNetwork <- inputs$tfCoopNetwork
+    tf.names <- inputs$tf.names
+    gene.names <- inputs$gene.names
+    num.TFs <- length(tf.names)
+    num.genes <- length(gene.names)
+    rm(inputs)
+  }
+  if (!is.null(expr)) {
     num.conditions <- ncol(expr)
     if (randomize == "within.gene") {
       expr <- t(apply(expr, 1, sample))
@@ -171,14 +121,14 @@ runPANDA <- function(
   }
   rm(expr)
   if (any(is.na(geneCoreg))) {
-    # check for NA and replace them by zero
+    # as netZooPy: if any correlation is NaN (constant genes), set the
+    # diagonal to 1 and NaN to 0
     diag(geneCoreg) <- 1
     geneCoreg[is.na(geneCoreg)] <- 0
   }
 
-  if (any(duplicated(motif))) {
-    cli::cli_alert_warning("Duplicate edges have been found in the motif data. Weights will be summed.")
-    motif <- aggregate(motif[, 3], by = list(motif[, 1], motif[, 2]), FUN = sum)
+  if (anyDuplicated(motif[, 1:2])) {
+    cli::cli_alert_warning("Some TF-gene pairs are repeated in the motif data. The last weight of each pair is used, as in netZooPy.")
   }
 
   ## Run PANDA ##
