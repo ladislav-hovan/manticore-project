@@ -9,7 +9,7 @@
 #' @param normalizeData Boolean to indicate normalization of expression data. Default TRUE performs log normalization.
 #' @param removeBatchEffect Boolean to indicate batch effect correction. Default FALSE.
 #' @param batch Factor or vector giving batch assignment for each cell; required if \code{removeBatchEffect = TRUE}.
-#' @param minCells Minimum number of cells per group required to build a network. Default is 30.
+#' @param minCells Minimum number of cells required to build a network. Default is 30.
 #' @param computingEngine Either 'cpu' or 'gpu'. Passed to \code{\link{lioness_single}}.
 #' @param nCores Number of processors to be used if BLAS or MPI is active.
 #' @param gammaValue Graining level of data (proportion of number of single cells to super-cells). Default 10.
@@ -50,12 +50,12 @@
 #' # i Normalizing networks
 #' # i Learning network
 #' # i Using tanimoto similarity
-#' # i Successfully ran PANDA on 281 Genes and 963 TFs
+#' # + Successfully ran PANDA on 281 Genes and 963 TFs
 #' # i Time elapsed: 3.99 seconds
 #' # i Computing 18 networks
-#' # i Networks successfully constructed
+#' # + Networks successfully constructed
 #' # i Total time elapsed: 68.53 seconds
-#' # i Networks successfully combined
+#' # + Networks successfully combined
 #'
 #' # head(nets_by_region)
 #' #                           tf target        T_1        T_2        T_3        T_4
@@ -563,7 +563,7 @@ runMANTICORE <- function(
       n_edges <- n_tf * n_target
 
       weight_matrix <- matrix(NA_real_, nrow = n_edges, ncol = n_nets)
-      colnames(weight_matrix) <- network_ids
+      colnames(weight_matrix) <- col_names
       for (k in seq_len(n_nets)) {
         net_k <- as.matrix(network_matrices[[k]][[net_name]])
         row_idx <- match(rownames(net_k), all_tfs)

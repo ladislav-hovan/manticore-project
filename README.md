@@ -27,6 +27,8 @@ cd manticore-project
 # Install the project into the local pixi environment
 # This will also setup the environment on the first use
 pixi run install-local
+# This version will also install optional requirements such as gpuR and mori
+# pixi run full-setup
 # Pixi-managed R installation - not the system one
 pixi run R
 ```
@@ -74,24 +76,32 @@ str(manticoreTest)
 
 ```
 List of 4
-$ gex     :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
-  ..@ Dim     : int [1:2] 300 1954
-  ..@ Dimnames:List of 2
-  .. ..$ : chr [1:300] "IGHM" "IGHG2" "IGLC3" ...
-  .. ..$ : chr [1:1954] "P31-T_AAACGGGTCGGTTAAC" ...
-$ tf      :'data.frame': 371738 obs. of  3 variables:
-  ..$ source_genesymbol: chr [1:371738] "MYC" "SPI1" ...
-  ..$ target_genesymbol: chr [1:371738] "TERT" "BGLAP" ...
-  ..$ weight           : num [1:371738] 1 1 1 ...
-$ ppi     :'data.frame': 4076 obs. of  3 variables:
-  ..$ source_genesymbol: chr [1:4076] "ZIC1" "HES5" ...
-  ..$ target_genesymbol: chr [1:4076] "ATOH1" "ATOH1" ...
-  ..$ weight           : num [1:4076] 1 1 1 ...
-$ metadata:'data.frame': 1954 obs. of  4 variables:
-  ..$ cell_id  : chr [1:1954] "P31-T_AAACGGGTCGGTTAAC" ...
-  ..$ donor    : chr [1:1954] "P31" "P31" ...
-  ..$ region   : chr [1:1954] "T" "T" ...
-  ..$ cell_type: Factor w/ 1 level "Epithelial": 1 1 ...
+ $ gex     :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
+  .. ..@ i       : int [1:4395] 29 32 41 43 61 170 208 245 251 269 ...
+  .. ..@ p       : int [1:181] 0 11 62 97 112 163 184 215 257 274 ...
+  .. ..@ Dim     : int [1:2] 300 180
+  .. ..@ Dimnames:List of 2
+  .. .. ..$ : chr [1:300] "IGHM" "IGHG2" "IGLC3" "IGLL5" ...
+  .. .. ..$ : chr [1:180] "P31-T_AAACGGGTCGGTTAAC" "P31-T_AAAGATGGTGGCCCTA" "P31-T_AAATGCCCACAGTCGC" "P31-T_AACACGTGTCATGCAT" ...
+  .. ..@ x       : num [1:4395] 1 1 1 1 2 2 1 1 2 1 ...
+  .. ..@ factors : list()
+ $ tf      :'data.frame':       371738 obs. of  3 variables:
+  ..$ source_genesymbol: chr [1:371738] "MYC" "SPI1" "JUN_JUND" "FOS_JUND" ...
+  ..$ target_genesymbol: chr [1:371738] "TERT" "BGLAP" "JUN" "JUN" ...
+  ..$ weight           : num [1:371738] 1 1 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "origin")= chr "cache"
+  ..- attr(*, "url")= chr "https://omnipathdb.org/interactions?genesymbols=yes&datasets=collectri,dorothea,kinaseextra,ligrecextra,lncrna_"| __truncated__
+ $ ppi     :'data.frame':       4076 obs. of  3 variables:
+  ..$ source_genesymbol: chr [1:4076] "ZIC1" "HES5" "ATOH1" "DLL1" ...
+  ..$ target_genesymbol: chr [1:4076] "ATOH1" "ATOH1" "HES5" "NOTCH1" ...
+  ..$ weight           : num [1:4076] 1 1 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "origin")= chr "cache"
+  ..- attr(*, "url")= chr "https://omnipathdb.org/interactions?genesymbols=yes&datasets=collectri,dorothea,kinaseextra,ligrecextra,lncrna_"| __truncated__
+ $ metadata:'data.frame':       180 obs. of  4 variables:
+  ..$ cell_id  : chr [1:180] "P31-T_AAACGGGTCGGTTAAC" "P31-T_AAAGATGGTGGCCCTA" "P31-T_AAATGCCCACAGTCGC" "P31-T_AACACGTGTCATGCAT" ...
+  ..$ donor    : chr [1:180] "P31" "P31" "P31" "P31" ...
+  ..$ region   : chr [1:180] "T" "T" "T" "T" ...
+  ..$ cell_type: Factor w/ 1 level "Epithelial": 1 1 1 1 1 1 1 1 1 1 ...
 ```
 
 </details>
@@ -133,15 +143,15 @@ networks <- runMANTICORE(
 | `normalizeData` | Apply log normalization to expression data before network inference | TRUE |
 | `removeBatchEffect` | Perform batch effect correction before network inference | FALSE |
 | `batch` | Factor or vector giving batch assignment for each cell; required if `removeBatchEffect = TRUE` | NULL |
-| `minCells` | Minimum number of cells required per group to build a network | 30 |
+| `minCells` | Minimum number of cells required to build a network | 30 |
 
-**Additional parameters:** All `scorpion()` parameters (`computingEngine`, `nCores`, `gammaValue`, `nPC`, `assocMethod`, `alphaValue`, `hammingValue`, `nIter`, `outNet`, `zScaling`, `showProgress`, `randomizationMethod`, `scaleByPresent`, `filterExpr`) can be passed to control network inference behavior. See `scorpion()` documentation above.
+**Additional parameters:** All `lioness_single()` parameters (`computingEngine`, `nCores`, `gammaValue`, `nPC`, `assocMethod`, `alphaValue`, `hammingValue`, `nIter`, `outNet`, `zScaling`, `showProgress`, `randomizationMethod`, `scaleByPresent`, `filterExpr`) can be passed to control network inference behavior.
 
 **Return value:**
 
 A data frame in wide format where:
 - Rows represent TF-target pairs
-- Columns represent network identifiers (derived from `groupBy` values)
+- Columns represent network identifiers (derived from `groupBy` values, as well as additional supercell identifier)
 - Values are edge weights from each network
 
 When more than one network type is requested via `outNet` (e.g. `c("regNet", "coregNet", "coopNet")`), an additional leading `edge_type` column is added and the requested networks are stacked in long format. The `edge_type` values map to the requested networks as follows:
@@ -154,18 +164,18 @@ When more than one network type is requested via `outNet` (e.g. `c("regNet", "co
 
 **Example output (single network type, default):**
 
-| tf | target | P31--T | P31--B | P31--N | P32--T | ... |
+| tf | target | P31--T_1 | P31--T_2 | P31--B_1 | P31--B_2 | ... |
 |----|--------|--------|--------|--------|--------|-----|
-| AATF | ACKR1 | -0.326 | -0.337 | -0.344 | -0.298 | ... |
-| ABL1 | ACKR1 | -0.340 | -0.339 | -0.351 | -0.312 | ... |
+| AATF | ACKR1 | -0.319 | -0.219 | -0.316 | -0.323 | ... |
+| ABL1 | ACKR1 | -0.341 | -0.257 | -0.339 | -0.347 | ... |
 
 **Example output (multiple network types):**
 
-| edge_type | tf | target | P31--T | P31--B | ... |
+| edge_type | tf | target | P31--T_1 | P31--T_2 | ... |
 |-----------|----|--------|--------|--------|-----|
-| tf-target | AATF | ACKR1 | -0.326 | -0.337 | ... |
-| gene-gene | ACKR1 | ACKR1 | 1.000 | 1.000 | ... |
-| tf-tf | AATF | AATF | 1.000 | 1.000 | ... |
+| tf-target | AATF | ACKR1 | -0.319 | -0.219 | ... |
+| gene-gene | ACKR1 | ACKR1 | 4.29e+05 | 4.02e+05 | ... |
+| tf-tf | AATF | AATF | 1.90e+06 | 2.51e+06 | ... |
 
 **Examples:**
 

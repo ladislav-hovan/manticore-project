@@ -47,7 +47,7 @@ runMANTICORE(
 
 \item{batch}{Factor or vector giving batch assignment for each cell; required if \code{removeBatchEffect = TRUE}.}
 
-\item{minCells}{Minimum number of cells per group required to build a network. Default is 30.}
+\item{minCells}{Minimum number of cells required to build a network. Default is 30.}
 
 \item{computingEngine}{Either 'cpu' or 'gpu'. Passed to \code{\link{lioness_single}}.}
 
@@ -107,12 +107,12 @@ nets_by_region <- runMANTICORE(
 # i Normalizing networks
 # i Learning network
 # i Using tanimoto similarity
-# i Successfully ran PANDA on 281 Genes and 963 TFs
+# + Successfully ran PANDA on 281 Genes and 963 TFs
 # i Time elapsed: 3.99 seconds
 # i Computing 18 networks
-# i Networks successfully constructed
+# + Networks successfully constructed
 # i Total time elapsed: 68.53 seconds
-# i Networks successfully combined
+# + Networks successfully combined
 
 # head(nets_by_region)
 #                           tf target        T_1        T_2        T_3        T_4
