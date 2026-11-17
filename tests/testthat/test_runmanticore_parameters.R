@@ -14,13 +14,13 @@ test_that("runMANTICORE() has tfMotifs parameter in signature", {
 test_that("runMANTICORE() gexMatrix parameter is required", {
   sig <- formals(runMANTICORE)
   # gexMatrix should not have a default value (either NULL or absent from formals)
-  expect_true(is.null(sig$gexMatrix) || !"gexMatrix" %in% names(sig) || 
+  expect_true(is.null(sig$gexMatrix) || !"gexMatrix" %in% names(sig) ||
               identical(as.character(sig$gexMatrix), ""))
 })
 
 test_that("runMANTICORE() tfMotifs parameter is required", {
   sig <- formals(runMANTICORE)
   # tfMotifs should not have a default value (either NULL or absent from formals)
-  expect_true(is.null(sig$tfMotifs) || !"tfMotifs" %in% names(sig) || 
+  expect_true(is.null(sig$tfMotifs) || !"tfMotifs" %in% names(sig) ||
               identical(as.character(sig$tfMotifs), ""))
 })

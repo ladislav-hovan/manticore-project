@@ -12,7 +12,7 @@
 #' @author Ladislav Hovan <ladislav.hovan@ncmbm.uio.no>, Daniel Osorio <daniecos@uio.no>
 #' @param pandaNet A list of networks inferred by PANDA on the full dataset (before single-sample inference).
 #' @param sample The name of the sample for which to infer a single-sample network.
-#' @param gexAdjusted An expression dataset, with genes in the rows and barcodes (cells) in the columns.
+#' @param gexMatrix An expression dataset, with genes in the rows and barcodes (cells) in the columns.
 #' @param tfMotifs A motif dataset (data.frame or matrix) with 3 columns: TF, target gene, and motif score. Pass NULL for co-expression analysis only.
 #' @param ppiNet A Protein-Protein-Interaction dataset (data.frame or matrix) with 3 columns: protein 1, protein 2, and interaction score. Pass NULL to disable protein interaction integration.
 #' @param computingEngine Character specifying computing device: 'cpu' or 'gpu' (if available). Default 'cpu'.
@@ -40,7 +40,7 @@
 lioness_single <- function(
   pandaNet,
   sample,
-  gexAdjusted,
+  gexMatrix,
   tfMotifs = NULL,
   ppiNet = NULL,
   computingEngine = "cpu",
@@ -83,18 +83,18 @@ lioness_single <- function(
   if (is.null(ppiNet) & is.null(tfMotifs)) {
     # Densify once; centering already destroys sparsity, so keep a single dense
     # base copy and use BLAS tcrossprod (dsyrk) for the co-expression matrix.
-    gexAdjusted <- as.matrix(gexAdjusted)
+    gexMatrix <- as.matrix(gexMatrix)
     if (assocMethod == "spearman") {
-      gexAdjusted <- t(apply(gexAdjusted, 1, rank))
+      gexMatrix <- t(apply(gexMatrix, 1, rank))
     }
-    geneCoExpr <- gexAdjusted - rowMeans(gexAdjusted)
+    geneCoExpr <- gexMatrix - rowMeans(gexMatrix)
     geneCoExpr <- geneCoExpr / sqrt(rowSums(geneCoExpr^2))
     return(tcrossprod(geneCoExpr))
   }
   outNetworks <- runPANDA(
     motif = tfMotifs,
     ppi = ppiNet,
-    expr = gexAdjusted[, colnames(gexAdjusted) != sample, drop = FALSE],
+    expr = gexMatrix[, colnames(gexMatrix) != sample, drop = FALSE],
     computing.engine = computingEngine,
     n.cores = nCores,
     alpha = alphaValue,
@@ -111,7 +111,7 @@ lioness_single <- function(
   for (netName in names(outNetworks)) {
     if (is.matrix(outNetworks[[netName]])) {
       outNetworks[[netName]] <- outNetworks[[netName]] + (
-        ncol(gexAdjusted) * (pandaNet[[netName]] - outNetworks[[netName]]))
+        ncol(gexMatrix) * (pandaNet[[netName]] - outNetworks[[netName]]))
     }
   }
 

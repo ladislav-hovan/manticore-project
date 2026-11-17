@@ -246,8 +246,9 @@
 #' # 6 AEBP2_EED_EZH2_RBBP4_SUZ12  ACKR1 -0.2991352 -0.3258038 -0.2779301 -0.3312577
 #' }
 #' @export
-#' @importFrom dplyr %>% mutate group_by filter .data pull summarize
+#' @importFrom arrow write_parquet
 #' @importFrom cli cli_h1 cli_alert_success cli_alert_info cli_abort cli_progress_along
+#' @importFrom dplyr %>% mutate group_by filter .data pull summarize
 #' @importFrom furrr future_map furrr_options
 #' @importFrom future plan multisession sequential
 runMANTICORE <- function(
@@ -273,7 +274,11 @@ runMANTICORE <- function(
   showProgress = TRUE,
   randomizationMethod = "None",
   scaleByPresent = FALSE,
-  filterExpr = FALSE
+  filterExpr = FALSE,
+  saveSingle = FALSE,
+  saveSingleFolder = "networks/",
+  returnFrame = TRUE
+  # TODO: Document the new parameters
 ) {
   # Input validation
   if (ncol(gexMatrix) != nrow(cellsMetadata)) {
@@ -297,6 +302,9 @@ runMANTICORE <- function(
   validNets <- c("regNet", "coregNet", "coopNet")
   if (length(outNet) < 1 || !all(outNet %in% validNets)) {
     cli::cli_abort("outNet must be one or more of: {paste(validNets, collapse=', ')}")
+  }
+  if (!saveSingle && !returnFrame) {
+    cli::cli_abort("At least one of saveSingle and returnFrame must be TRUE, otherwise the networks won't be retrieved")
   }
 
   if (showProgress) {
@@ -375,6 +383,9 @@ runMANTICORE <- function(
   if (n_total_cells < min_cells) {
     cli::cli_abort(paste0("There are not enough total cells (< ", min_cells, ") to build reliable networks."))
   }
+  if (n_total_cells > 300 && returnFrame) {
+    cli::cli_warn("You may be creating too many networks to keep them in a single frame, consider setting returnFrame = FALSE and saveSingle = TRUE")  
+  }
 
   network_ids <- unique(metadata$network_id)
   cells_by_network <- split(metadata$cell_id, metadata$network_id)
@@ -384,6 +395,7 @@ runMANTICORE <- function(
   for (nid in network_ids) {
     gexChunk <- gexMatrix[, cells_by_network[[nid]], drop = FALSE]
     gexSC <- makeSuperCells(X = gexChunk, gamma = gammaValue, n.pc = nPC, fast.pca = FALSE)
+    # TODO: Save the assignments of cells to supercells
     n_cols <- ncol(gexSC)
     colnames(gexSC) <- paste0(nid, "_", seq_len(n_cols))
     gexList[[nid]] <- gexSC
@@ -414,7 +426,7 @@ runMANTICORE <- function(
   # Applies LIONESS to an expression chunk with a single missing column
   compute_network <- function(sample) {
     network <- lioness_single(
-      gexAdjusted = gexAdjusted,
+      gexMatrix = gexAdjusted,
       tfMotifs = tfMotifs,
       ppiNet = ppiNet,
       pandaNet = pandaNet,
@@ -432,12 +444,31 @@ runMANTICORE <- function(
       scaleByPresent = scaleByPresent
     )
 
+    # Save a single network if requested
+    if (saveSingle) {
+      if (length(outNet) == 1L) {
+        frame <- data.frame(network[[outNet]])
+        frame <- cbind(index=rownames(frame), frame)
+        fileName <- paste0(saveSingleFolder, "/", outNet, "__", sample, ".parquet")
+        write_parquet(frame, fileName)
+      }
+      else {
+        for (oneNet in outNet) {
+          frame <- data.frame(network[[oneNet]])
+          frame <- cbind(index=rownames(frame), frame)
+          fileName <- paste0(saveSingleFolder, "/", oneNet, "__", sample, ".parquet")
+          write_parquet(frame, fileName)
+        }
+      }
+    }
     # Return a single matrix when one network is requested, otherwise a
     # named list of the requested network matrices.
-    if (length(outNet) == 1L) {
-      return(network[[outNet]])
+    if (returnFrame) {
+      if (length(outNet) == 1L) {
+        return(network[[outNet]])
+      }
+      return(network[outNet])
     }
-    return(network[outNet])
   }
 
   # The TF-motif prior and PPI network are broadcast to every parallel worker.
@@ -475,6 +506,9 @@ runMANTICORE <- function(
   n_total <- ncol(gexAdjusted)
   col_names <- colnames(gexAdjusted)
 
+  # Create directory for saving
+  dir.create(file.path(saveSingleFolder), showWarnings = FALSE)
+
   if (showProgress) {
     cli::cli_alert_info(paste0("Computing ", n_total, " networks"))
     tic <- proc.time()[3]
@@ -494,6 +528,7 @@ runMANTICORE <- function(
   } else {
     network_matrices <- furrr::future_map(col_names, compute_network, .options = furrr_opts, .progress = FALSE)
   }
+  if (!returnFrame) return(NULL)
 
   n_nets <- length(network_matrices)
 

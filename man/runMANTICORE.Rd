@@ -27,7 +27,10 @@ runMANTICORE(
   showProgress = TRUE,
   randomizationMethod = "None",
   scaleByPresent = FALSE,
-  filterExpr = FALSE
+  filterExpr = FALSE,
+  saveSingle = FALSE,
+  saveSingleFolder = "networks/",
+  returnFrame = TRUE
 )
 }
 \arguments{

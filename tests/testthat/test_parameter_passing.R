@@ -1,35 +1,9 @@
-# Tests for parameter passing between scorpion() and runMANTICORE()
+# Tests for parameter passing between lioness_single() and runMANTICORE()
 # Validates that parameters are correctly passed from wrapper to core function
 
-test_that("scorpion() and runMANTICORE() share compatible parameter defaults", {
+test_that("runMANTICORE() correctly passes computingEngine parameter to lioness_single()", {
   data(manticoreTest)
-  
-  # scorpion() with default parameters
-  result_scorpion <- scorpion(
-    tfMotifs = manticoreTest$tf,
-    gexMatrix = manticoreTest$gex[, 1:100],
-    ppiNet = manticoreTest$ppi,
-    showProgress = FALSE
-  )
-  
-  # Both functions should work with default parameters
-  result_runscoprion <- runMANTICORE(
-    gexMatrix = manticoreTest$gex,
-    tfMotifs = manticoreTest$tf,
-    ppiNet = manticoreTest$ppi,
-    cellsMetadata = manticoreTest$metadata,
-    groupBy = "region",
-    showProgress = FALSE
-  )
-  
-  # Both should succeed
-  expect_true(is.list(result_scorpion) || is.matrix(result_scorpion))
-  expect_true(is.data.frame(result_runscoprion))
-})
 
-test_that("runMANTICORE() correctly passes computingEngine parameter to scorpion()", {
-  data(manticoreTest)
-  
   result_cpu <- runMANTICORE(
     gexMatrix = manticoreTest$gex,
     tfMotifs = manticoreTest$tf,
@@ -39,14 +13,14 @@ test_that("runMANTICORE() correctly passes computingEngine parameter to scorpion
     computingEngine = "cpu",
     showProgress = FALSE
   )
-  
+
   expect_true(is.data.frame(result_cpu))
   expect_true(all(c("tf", "target") %in% colnames(result_cpu)))
 })
 
-test_that("runMANTICORE() correctly passes nPC parameter to scorpion()", {
+test_that("runMANTICORE() correctly passes nPC parameter to lioness_single()", {
   data(manticoreTest)
-  
+
   result <- runMANTICORE(
     gexMatrix = manticoreTest$gex,
     tfMotifs = manticoreTest$tf,
@@ -56,13 +30,13 @@ test_that("runMANTICORE() correctly passes nPC parameter to scorpion()", {
     nPC = 20,
     showProgress = FALSE
   )
-  
+
   expect_true(is.data.frame(result))
 })
 
-test_that("runMANTICORE() correctly passes assocMethod parameter to scorpion()", {
+test_that("runMANTICORE() correctly passes assocMethod parameter to lioness_single()", {
   data(manticoreTest)
-  
+
   result <- runMANTICORE(
     gexMatrix = manticoreTest$gex,
     tfMotifs = manticoreTest$tf,
@@ -72,6 +46,6 @@ test_that("runMANTICORE() correctly passes assocMethod parameter to scorpion()",
     assocMethod = "pearson",
     showProgress = FALSE
   )
-  
+
   expect_true(is.data.frame(result))
 })

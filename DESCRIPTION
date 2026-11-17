@@ -11,7 +11,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
-Imports: cli, dplyr, furrr, future, igraph, irlba, Matrix, methods, pbapply, RANN
+Imports: arrow, cli, dplyr, furrr, future, igraph, irlba, Matrix, methods, pbapply, RANN
 Suggests: biomaRt, circlize, fgsea, mori, RhpcBLASctl, testthat
 URL: https://github.com/ladislav-hovan/manticore-project
 BugReports: https://github.com/ladislav-hovan/manticore-project/issues

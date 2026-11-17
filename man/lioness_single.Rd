@@ -7,7 +7,7 @@
 lioness_single(
   pandaNet,
   sample,
-  gexAdjusted,
+  gexMatrix,
   tfMotifs = NULL,
   ppiNet = NULL,
   computingEngine = "cpu",
@@ -28,7 +28,7 @@ lioness_single(
 
 \item{sample}{The name of the sample for which to infer a single-sample network.}
 
-\item{gexAdjusted}{An expression dataset, with genes in the rows and barcodes (cells) in the columns.}
+\item{gexMatrix}{An expression dataset, with genes in the rows and barcodes (cells) in the columns.}
 
 \item{tfMotifs}{A motif dataset (data.frame or matrix) with 3 columns: TF, target gene, and motif score. Pass NULL for co-expression analysis only.}
 

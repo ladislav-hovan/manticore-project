@@ -19,6 +19,7 @@ install-mori = "R -e 'install.packages(\"mori\", repos = \"https://cloud.r-proje
 [dependencies]
 bioconductor-biomart = ">=2.62.0,<3"
 bioconductor-fgsea = ">=1.32.2,<2"
+r-arrow = ">=25.0.1,<26"
 r-base = "4.4.*"
 r-circlize = ">=0.4.18,<0.5"
 r-cli = ">=3.6.6,<4"
