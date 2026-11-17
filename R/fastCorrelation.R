@@ -28,7 +28,8 @@ fastCorrelation <- function(
   # Correlation — column-by-column division avoids full-size outer product
   result <- crossprod(RX, RY)
   for (j in seq_len(ncol(result))) {
-    result[, j] <- result[, j] / (nx * ny[j])
+    # clipped to [-1, 1] as numpy.corrcoef (NaN stays NaN)
+    result[, j] <- pmin(pmax(result[, j] / (nx * ny[j]), -1), 1)
   }
   result
 }

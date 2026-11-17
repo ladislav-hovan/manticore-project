@@ -1,18 +1,20 @@
 #' @importFrom Matrix Matrix
-#' @export manticore
-#' @title Build gene regulatory networks from single-cell RNA-seq data using PANDA
+#' @export lioness_single
+#' @title Build gene regulatory networks for a single sample using PANDA and the LIONESS equation
 #' @description
-#' Constructs gene regulatory networks from single-cell/nuclei RNA-seq data by first
-#' applying coarse-graining to reduce sparsity, then running the PANDA (Passing
-#' Attributes between Networks for Data Assimilation) message-passing algorithm to
-#' integrate transcription factor motifs, protein-protein interactions, and gene
-#' expression data into unified regulatory networks.
-#' @author Daniel Osorio <daniecos@uio.no>
-#' @param tfMotifs A motif dataset (data.frame or matrix) with 3 columns: TF, target gene, and motif score. Pass NULL for co-expression analysis only.
-#' @param gexAdjusted An expression dataset, with genes in the rows and barcodes (cells) in the columns.
-#' @param ppiNet A Protein-Protein-Interaction dataset (data.frame or matrix) with 3 columns: protein 1, protein 2, and interaction score. Pass NULL to disable protein interaction integration.
+#' Constructs gene regulatory networks from single-cell/nuclei RNA-seq data
+#' for a single sample by running the PANDA (Passing Attributes between
+#' Networks for Data Assimilation) message-passing algorithm on the expression
+#' matrix without that sample to integrate transcription factor motifs,
+#' protein-protein interactions, and gene expression data into unified
+#' regulatory networks. The LIONESS equation is then applied to infer the
+#' single-sample network for the sample of interest.
+#' @author Ladislav Hovan <ladislav.hovan@ncmbm.uio.no>, Daniel Osorio <daniecos@uio.no>
 #' @param pandaNet A list of networks inferred by PANDA on the full dataset (before single-sample inference).
-#' @param sample The name of the sample (cell barcode) for which to infer a single-sample network.
+#' @param sample The name of the sample for which to infer a single-sample network.
+#' @param gexMatrix An expression dataset, with genes in the rows and barcodes (cells) in the columns.
+#' @param tfMotifs A motif dataset (data.frame or matrix) with 3 columns: TF, target gene, and motif score. Pass NULL for co-expression analysis only.
+#' @param ppiNet A Protein-Protein-Interaction dataset (data.frame or matrix) with 3 columns: protein 1, protein 2, and interaction score. Pass NULL to disable protein interaction integration.
 #' @param computingEngine Character specifying computing device: 'cpu' or 'gpu' (if available). Default 'cpu'.
 #' @param nCores Number of processors to be used if BLAS or MPI is active.
 #' @param alphaValue Numeric update parameter (0 to 1) controlling relative contribution of prior networks. Default 0.1.
@@ -34,13 +36,13 @@
 #'     \item{numTFs: Number of transcription factors}
 #'     \item{numEdges: Total number of edges in regulatory network}
 #'   }
-#' @seealso \code{\link{runMANTICORE}} for building networks across cell groups.
-manticore <- function(
-  tfMotifs = NULL,
-  gexAdjusted,
-  ppiNet = NULL,
+#' @seealso \code{\link{runMANTICORE}} for building supercell-specific networks, which uses this function internally.
+lioness_single <- function(
   pandaNet,
   sample,
+  gexMatrix,
+  tfMotifs = NULL,
+  ppiNet = NULL,
   computingEngine = "cpu",
   nCores = 1,
   assocMethod = "pearson",
@@ -81,18 +83,18 @@ manticore <- function(
   if (is.null(ppiNet) & is.null(tfMotifs)) {
     # Densify once; centering already destroys sparsity, so keep a single dense
     # base copy and use BLAS tcrossprod (dsyrk) for the co-expression matrix.
-    gexAdjusted <- as.matrix(gexAdjusted)
+    gexMatrix <- as.matrix(gexMatrix)
     if (assocMethod == "spearman") {
-      gexAdjusted <- t(apply(gexAdjusted, 1, rank))
+      gexMatrix <- t(apply(gexMatrix, 1, rank))
     }
-    geneCoExpr <- gexAdjusted - rowMeans(gexAdjusted)
+    geneCoExpr <- gexMatrix - rowMeans(gexMatrix)
     geneCoExpr <- geneCoExpr / sqrt(rowSums(geneCoExpr^2))
     return(tcrossprod(geneCoExpr))
   }
   outNetworks <- runPANDA(
     motif = tfMotifs,
     ppi = ppiNet,
-    expr = gexAdjusted[, colnames(gexAdjusted) != sample, drop = FALSE],
+    expr = gexMatrix[, colnames(gexMatrix) != sample, drop = FALSE],
     computing.engine = computingEngine,
     n.cores = nCores,
     alpha = alphaValue,
@@ -109,7 +111,7 @@ manticore <- function(
   for (netName in names(outNetworks)) {
     if (is.matrix(outNetworks[[netName]])) {
       outNetworks[[netName]] <- outNetworks[[netName]] + (
-        ncol(gexAdjusted) * (pandaNet[[netName]] - outNetworks[[netName]]))
+        ncol(gexMatrix) * (pandaNet[[netName]] - outNetworks[[netName]]))
     }
   }
 

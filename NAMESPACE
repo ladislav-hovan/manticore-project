@@ -2,16 +2,16 @@
 
 export(circosEdges)
 export(enrichEdges)
+export(lioness_single)
 export(maEdges)
-export(manticore)
 export(regressEdges)
 export(runMANTICORE)
-export(scorpion)
 export(testEdges)
 import(Matrix)
 import(cli)
 importFrom(Matrix,Matrix)
 importFrom(RANN,nn2)
+importFrom(arrow,write_parquet)
 importFrom(cli,
   cli_abort,
   cli_alert_info,

@@ -33,8 +33,9 @@ test_that("runMANTICORE() produces wide-format output with network columns", {
   expect_true(length(network_columns) > 0)
 
   # Check that network column names match the unique grouping values
-  unique_regions <- unique(manticoreTest$metadata$region)
-  expect_true(all(unique_regions %in% network_columns))
+  grid <- expand.grid(unique(manticoreTest$metadata$region), 1:6)
+  expected_networks <- paste(grid$Var1, grid$Var2, sep='_')
+  expect_true(all(expected_networks %in% network_columns))
 })
 
 # test_that("runMANTICORE() handles NULL ppiNet correctly", {

@@ -18,11 +18,10 @@ makeSuperCells <- function(
   use.nn2 = TRUE,
   seed = 12345,
   igraph.clustering = c("walktrap", "louvain"),
-  return.singlecell.NW = TRUE,
-  return.hierarchical.structure = TRUE,
   block.size = 10000,
   weights = NULL,
-  do.median.norm = FALSE
+  do.median.norm = FALSE,
+  return.assignments = FALSE
 ) {
   N.c <- ncol(X)
   GE <- X
@@ -143,7 +142,7 @@ makeSuperCells <- function(
 
   sc.nw <-
     buildKNN(
-      X = PCA.presampled$x[, n.pc],
+      X = PCA.presampled$x[, min(n.pc, ncol(PCA.presampled$x))],
       k = k.knn,
       from = "coordinates",
       use.nn2 = use.nn2,
@@ -276,5 +275,9 @@ makeSuperCells <- function(
     GE <- (GE + 0.01) / apply(GE + 0.01, 1, median)
   }
 
-  return(GE)
+  if (return.assignments) {
+    return(list(gex = GE, assignments = membership))
+  } else {
+    return(GE)
+  }
 }
