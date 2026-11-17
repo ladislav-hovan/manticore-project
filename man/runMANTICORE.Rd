@@ -30,7 +30,8 @@ runMANTICORE(
   filterExpr = FALSE,
   saveSingle = FALSE,
   saveSingleFolder = "networks/",
-  returnFrame = TRUE
+  returnFrame = TRUE,
+  cellAssignmentFile = NULL
 )
 }
 \arguments{
@@ -79,6 +80,14 @@ runMANTICORE(
 \item{scaleByPresent}{Boolean to indicate scaling of correlations by percentage of positive samples. Default FALSE.}
 
 \item{filterExpr}{Boolean to indicate whether or not to remove genes with 0 expression across all cells. Default FALSE.}
+
+\item{saveSingle}{Whether to save individual supercell-specific networks into parquet files as they are being created. Default FALSE.}
+
+\item{saveSingleFolder}{Folder to save the individual supercell-specific networks into, if saveSingle is TRUE. Default "networks/".}
+
+\item{returnFrame}{Whether to return all the networks as a single data frame in the end. Default TRUE.}
+
+\item{cellAssignmentFile}{File to which the information about cell assignment to supercells will be saved. Default NULL (not saved).}
 }
 \value{
 A data.frame in wide format where rows represent TF-target pairs (union across all networks) and columns represent network identifiers. Cell values are edge weights from the corresponding network. When multiple network types are requested via \code{outNet}, an additional leading \code{edge_type} column identifies the network each row comes from and the network types are stacked in long format.
