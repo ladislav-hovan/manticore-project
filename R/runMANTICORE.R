@@ -24,6 +24,10 @@
 #' @param randomizationMethod Method by which to randomize gene expression matrix. Default "None". Must be one of "None", "within.gene", "by.gene".
 #' @param scaleByPresent Boolean to indicate scaling of correlations by percentage of positive samples. Default FALSE.
 #' @param filterExpr Boolean to indicate whether or not to remove genes with 0 expression across all cells. Default FALSE.
+#' @param saveSingle Whether to save individual supercell-specific networks into parquet files as they are being created. Default FALSE.
+#' @param saveSingleFolder Folder to save the individual supercell-specific networks into, if saveSingle is TRUE. Default "networks/".
+#' @param returnFrame Whether to return all the networks as a single data frame in the end. Default TRUE.
+#' @param cellAssignmentFile File to which the information about cell assignment to supercells will be saved. Default NULL (not saved).
 #' @return A data.frame in wide format where rows represent TF-target pairs (union across all networks) and columns represent network identifiers. Cell values are edge weights from the corresponding network. When multiple network types are requested via \code{outNet}, an additional leading \code{edge_type} column identifies the network each row comes from and the network types are stacked in long format.
 #' @seealso \code{\link{testEdges}}, \code{\link{regressEdges}}
 #' @examples
@@ -277,8 +281,8 @@ runMANTICORE <- function(
   filterExpr = FALSE,
   saveSingle = FALSE,
   saveSingleFolder = "networks/",
-  returnFrame = TRUE
-  # TODO: Document the new parameters
+  returnFrame = TRUE,
+  cellAssignmentFile = NULL
 ) {
   # Input validation
   if (ncol(gexMatrix) != nrow(cellsMetadata)) {
@@ -392,16 +396,29 @@ runMANTICORE <- function(
 
   # Group the supercells here but keep everything together
   gexList = list()
+  cellAssignments = data.frame()
   for (nid in network_ids) {
     gexChunk <- gexMatrix[, cells_by_network[[nid]], drop = FALSE]
-    gexSC <- makeSuperCells(X = gexChunk, gamma = gammaValue, n.pc = nPC, fast.pca = FALSE)
-    # TODO: Save the assignments of cells to supercells
+    result <- makeSuperCells(X = gexChunk, gamma = gammaValue, n.pc = nPC, fast.pca = FALSE, return.assignments = !is.null(cellAssignmentFile))
+    if (!is.null(cellAssignmentFile)) {
+      gexSC <- result$gex
+      assignment <- result$assignment
+      df <- data.frame(assignment)
+      df <- df %>% mutate(group = paste0(nid, "_", assignment), .keep = "none")
+      cellAssignments <- rbind(cellAssignments, df)
+    } else {
+      gexSC <- result
+    }
     n_cols <- ncol(gexSC)
     colnames(gexSC) <- paste0(nid, "_", seq_len(n_cols))
     gexList[[nid]] <- gexSC
   }
   gexAdjusted <- do.call(cbind, gexList)
-  rm(gexMatrix, metadata, gexList, gexChunk, gexSC, cells_by_network)
+  if (!is.null(cellAssignmentFile)) {
+    cellAssignments <- cbind(index=rownames(cellAssignments), cellAssignments)
+    write_parquet(cellAssignments, cellAssignmentFile)
+  }
+  rm(gexMatrix, metadata, gexList, gexChunk, gexSC, cells_by_network, cellAssignments)
 
   if (showProgress) {
     cli::cli_alert_info(paste0("Computing the background PANDA network"))
